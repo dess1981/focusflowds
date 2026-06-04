@@ -1,0 +1,114 @@
+{
+  "name": "Task",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo da tarefa"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o detalhada"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "todo",
+        "in_progress",
+        "done",
+        "cancelled"
+      ],
+      "default": "todo"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "urgent",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "category_id": {
+      "type": "string",
+      "description": "ID da categoria"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID do projeto"
+    },
+    "parent_task_id": {
+      "type": "string",
+      "description": "ID da tarefa pai (para subtarefas)"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "due_time": {
+      "type": "string",
+      "description": "Hor\u00e1rio de vencimento (HH:mm)"
+    },
+    "time_block_start": {
+      "type": "string",
+      "description": "In\u00edcio do bloco de tempo (HH:mm)"
+    },
+    "time_block_end": {
+      "type": "string",
+      "description": "Fim do bloco de tempo (HH:mm)"
+    },
+    "estimated_minutes": {
+      "type": "number",
+      "description": "Tempo estimado em minutos"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionais"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "recurrence": {
+      "type": "string",
+      "enum": [
+        "none",
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "default": "none"
+    },
+    "energy_level": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium",
+      "description": "N\u00edvel de energia necess\u00e1rio (\u00fatil para TDAH)"
+    },
+    "drive_file_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs de arquivos do Google Drive anexados"
+    },
+    "calendar_event_id": {
+      "type": "string",
+      "description": "ID do evento no Google Calendar"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

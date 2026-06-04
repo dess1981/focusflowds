@@ -1,0 +1,47 @@
+{
+  "name": "TimeBlock",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Nome do bloco de tempo"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Hor\u00e1rio de in\u00edcio (HH:mm)"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Hor\u00e1rio de t\u00e9rmino (HH:mm)"
+    },
+    "task_id": {
+      "type": "string",
+      "description": "ID da tarefa vinculada"
+    },
+    "color": {
+      "type": "string",
+      "default": "#4F6BED"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "task",
+        "break",
+        "focus",
+        "meeting",
+        "personal"
+      ],
+      "default": "task"
+    }
+  },
+  "required": [
+    "title",
+    "date",
+    "start_time",
+    "end_time"
+  ]
+}

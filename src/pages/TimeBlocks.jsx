@@ -1,0 +1,213 @@
+import React, { useState, useMemo } from 'react';
+import { base44 } from '@/api/base44Client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { Plus, Clock, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { format, addDays, subDays, isToday } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+
+const typeConfig = {
+  task: { label: 'Tarefa', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+  break: { label: 'Pausa', color: 'bg-green-100 text-green-700 border-green-200' },
+  focus: { label: 'Foco', color: 'bg-purple-100 text-purple-700 border-purple-200' },
+  meeting: { label: 'Reunião', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  personal: { label: 'Pessoal', color: 'bg-rose-100 text-rose-700 border-rose-200' },
+};
+
+const defaultBlock = { title: '', date: '', start_time: '', end_time: '', type: 'task', color: '#4F6BED' };
+
+export default function TimeBlocks() {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showForm, setShowForm] = useState(false);
+  const [editBlock, setEditBlock] = useState(null);
+  const [form, setForm] = useState(defaultBlock);
+  const queryClient = useQueryClient();
+  const dateStr = format(selectedDate, 'yyyy-MM-dd');
+
+  const { data: blocks = [] } = useQuery({
+    queryKey: ['timeblocks'],
+    queryFn: () => base44.entities.TimeBlock.list('-created_date', 200),
+  });
+
+  const dayBlocks = useMemo(() =>
+    blocks.filter(b => b.date === dateStr).sort((a, b) => a.start_time.localeCompare(b.start_time)),
+    [blocks, dateStr]
+  );
+
+  const saveMutation = useMutation({
+    mutationFn: async (data) => {
+      if (editBlock) {
+        await base44.entities.TimeBlock.update(editBlock.id, data);
+      } else {
+        await base44.entities.TimeBlock.create(data);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['timeblocks'] });
+      setShowForm(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.TimeBlock.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['timeblocks'] }),
+  });
+
+  const openForm = (block) => {
+    if (block) {
+      setEditBlock(block);
+      setForm({ title: block.title, date: block.date, start_time: block.start_time, end_time: block.end_time, type: block.type || 'task', color: block.color || '#4F6BED' });
+    } else {
+      setEditBlock(null);
+      setForm({ ...defaultBlock, date: dateStr });
+    }
+    setShowForm(true);
+  };
+
+  // Calculate duration in minutes
+  const getDuration = (start, end) => {
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    return (eh * 60 + em) - (sh * 60 + sm);
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-heading font-bold tracking-tight">Blocos de Tempo</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Organize seu dia em blocos</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" onClick={() => setSelectedDate(d => subDays(d, 1))}>
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <Button variant={isToday(selectedDate) ? "default" : "outline"} size="sm" onClick={() => setSelectedDate(new Date())}>
+            Hoje
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => setSelectedDate(d => addDays(d, 1))}>
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+          <Button className="ml-2" onClick={() => openForm(null)}>
+            <Plus className="w-4 h-4 mr-1.5" />
+            Novo Bloco
+          </Button>
+        </div>
+      </div>
+
+      <p className="text-sm font-medium">
+        {format(selectedDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
+      </p>
+
+      {/* Timeline */}
+      <div className="space-y-2">
+        {dayBlocks.map((block, i) => {
+          const config = typeConfig[block.type] || typeConfig.task;
+          const duration = getDuration(block.start_time, block.end_time);
+
+          return (
+            <motion.div
+              key={block.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <Card
+                className="cursor-pointer hover:shadow-md transition-all group relative overflow-hidden"
+                onClick={() => openForm(block)}
+              >
+                <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: block.color || '#4F6BED' }} />
+                <CardContent className="p-4 pl-5 flex items-center gap-4">
+                  <div className="text-center min-w-[80px]">
+                    <p className="text-sm font-semibold">{block.start_time}</p>
+                    <p className="text-xs text-muted-foreground">{block.end_time}</p>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm">{block.title}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={cn("text-xs px-2 py-0.5 rounded-full border", config.color)}>
+                        {config.label}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{duration} min</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(block.id); }}
+                    className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-destructive transition-all"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
+
+        {dayBlocks.length === 0 && (
+          <div className="text-center py-16">
+            <Clock className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
+            <p className="text-muted-foreground">Nenhum bloco de tempo para este dia</p>
+            <Button className="mt-4" variant="outline" onClick={() => openForm(null)}>
+              <Plus className="w-4 h-4 mr-1.5" />
+              Criar Bloco
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editBlock ? 'Editar Bloco' : 'Novo Bloco de Tempo'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label>Título *</Label>
+              <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="O que você vai fazer?" className="mt-1" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Início</Label>
+                <Input type="time" value={form.start_time} onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))} className="mt-1" />
+              </div>
+              <div>
+                <Label>Fim</Label>
+                <Input type="time" value={form.end_time} onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))} className="mt-1" />
+              </div>
+            </div>
+            <div>
+              <Label>Tipo</Label>
+              <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v }))}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="task">📋 Tarefa</SelectItem>
+                  <SelectItem value="focus">🎯 Foco Profundo</SelectItem>
+                  <SelectItem value="meeting">📅 Reunião</SelectItem>
+                  <SelectItem value="break">☕ Pausa</SelectItem>
+                  <SelectItem value="personal">🏠 Pessoal</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Data</Label>
+              <Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} className="mt-1" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
+            <Button onClick={() => saveMutation.mutate(form)} disabled={!form.title.trim() || !form.start_time || !form.end_time}>
+              {editBlock ? 'Salvar' : 'Criar Bloco'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
