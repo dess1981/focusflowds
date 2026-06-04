@@ -15,7 +15,7 @@ const navItems = [
   { path: '/projects', icon: FolderKanban, label: 'Projetos' },
   { path: '/time-blocks', icon: Clock, label: 'Blocos de Tempo' },
   { path: '/categories', icon: Tag, label: 'Categorias' },
-  { path: '/ai-assistant', icon: Sparkles, label: 'Assistente IA' },
+  { path: '/assistant', icon: Sparkles, label: 'Assistente IA' },
 ];
 
 export default function Sidebar() {

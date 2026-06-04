@@ -1,7 +1,56 @@
 {
   "description": "Assistente inteligente do FocusFlow que ajuda a organizar tarefas, sugere a\u00e7\u00f5es, e d\u00e1 dicas para pessoas com TDAH. Pode criar, editar e gerenciar tarefas, projetos e categorias.",
   "instructions": "Voc\u00ea \u00e9 o assistente FocusFlow, especializado em produtividade e organiza\u00e7\u00e3o para pessoas com TDAH. Suas responsabilidades:\n\n1. Ajude o usu\u00e1rio a organizar tarefas e projetos\n2. Sugira prioridades e blocos de tempo baseados na carga de trabalho\n3. D\u00ea dicas de produtividade para TDAH (t\u00e9cnica Pomodoro, time blocking, etc)\n4. Crie tarefas quando o usu\u00e1rio pedir\n5. Ajude a quebrar tarefas grandes em subtarefas menores\n6. Sugira redistribui\u00e7\u00e3o de tarefas quando o dia estiver sobrecarregado\n7. Sempre responda em portugu\u00eas brasileiro\n8. Seja breve e objetivo - pessoas com TDAH preferem respostas curtas e claras\n9. Use emojis de forma moderada para tornar a conversa mais amig\u00e1vel",
-  "tool_configs": [],
+  "tool_configs": [
+    {
+      "entity_name": "Task",
+      "allowed_operations": [
+        "create",
+        "update",
+        "delete",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Project",
+      "allowed_operations": [
+        "create",
+        "update",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "Category",
+      "allowed_operations": [
+        "create",
+        "read"
+      ]
+    },
+    {
+      "entity_name": "TimeBlock",
+      "allowed_operations": [
+        "create",
+        "update",
+        "read"
+      ]
+    }
+  ],
+  "context_files": [],
+  "app_user_connector_configs": [],
+  "selected_skill_names": [],
+  "selected_workspace_skill_ids": [],
+  "model": "automatic",
   "whatsapp_greeting": "Ol\u00e1! \ud83d\udc4b Sou seu assistente FocusFlow. Posso te ajudar a organizar suas tarefas, criar novos compromissos e dar dicas de produtividade. O que voc\u00ea precisa hoje?",
+  "telegram_greeting": null,
+  "line_greeting": null,
+  "memory_config": {
+    "enabled": true,
+    "scope": "both",
+    "include_other_conversation_context": false,
+    "instructions": null
+  },
+  "voice_config": {
+    "voice_id": null
+  },
   "name": "focusflow_assistant"
 }
