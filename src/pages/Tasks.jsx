@@ -4,10 +4,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Search, Trash2 } from 'lucide-react';
+import { Plus, Search, LayoutList, Kanban } from 'lucide-react';
 import TaskCard from '@/components/tasks/TaskCard';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog';
+import KanbanBoard from '@/components/tasks/KanbanBoard';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Tasks() {
@@ -16,6 +16,7 @@ export default function Tasks() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [view, setView] = useState('list');
   const queryClient = useQueryClient();
 
   // Check for ?new=true
@@ -74,10 +75,27 @@ export default function Tasks() {
           <h1 className="text-2xl font-heading font-bold tracking-tight">Tarefas</h1>
           <p className="text-muted-foreground text-sm mt-0.5">{filtered.length} tarefa{filtered.length !== 1 ? 's' : ''}</p>
         </div>
-        <Button onClick={() => { setEditTask(null); setShowForm(true); }}>
-          <Plus className="w-4 h-4 mr-1.5" />
-          Nova Tarefa
-        </Button>
+        <div className="flex items-center gap-2">
+          {/* View Toggle */}
+          <div className="flex items-center border border-border rounded-lg p-1 bg-muted/50">
+            <button
+              onClick={() => setView('list')}
+              className={`p-1.5 rounded-md transition-colors ${view === 'list' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              <LayoutList className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setView('kanban')}
+              className={`p-1.5 rounded-md transition-colors ${view === 'kanban' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              <Kanban className="w-4 h-4" />
+            </button>
+          </div>
+          <Button onClick={() => { setEditTask(null); setShowForm(true); }}>
+            <Plus className="w-4 h-4 mr-1.5" />
+            Nova Tarefa
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -112,32 +130,41 @@ export default function Tasks() {
         </Select>
       </div>
 
-      {/* Task List */}
-      <div className="space-y-2">
-        <AnimatePresence>
-          {filtered.map((task, i) => (
-            <motion.div
-              key={task.id}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ delay: i * 0.02 }}
-            >
-              <TaskCard
-                task={task}
-                onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
-                onClick={() => { setEditTask(task); setShowForm(true); }}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
+      {/* Task Views */}
+      {view === 'kanban' ? (
+        <KanbanBoard
+          tasks={filtered}
+          onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
+          onTaskClick={(task) => { setEditTask(task); setShowForm(true); }}
+          onNewTask={() => { setEditTask(null); setShowForm(true); }}
+        />
+      ) : (
+        <div className="space-y-2">
+          <AnimatePresence>
+            {filtered.map((task, i) => (
+              <motion.div
+                key={task.id}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ delay: i * 0.02 }}
+              >
+                <TaskCard
+                  task={task}
+                  onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
+                  onClick={() => { setEditTask(task); setShowForm(true); }}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
 
-        {!isLoading && filtered.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-muted-foreground">Nenhuma tarefa encontrada</p>
-          </div>
-        )}
-      </div>
+          {!isLoading && filtered.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground">Nenhuma tarefa encontrada</p>
+            </div>
+          )}
+        </div>
+      )}
 
       <TaskFormDialog
         open={showForm}
