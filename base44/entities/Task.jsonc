@@ -151,6 +151,10 @@
       "type": "string",
       "description": "ID do evento no Google Calendar"
     },
+    "email_message_id": {
+      "type": "string",
+      "description": "ID do email do Gmail vinculado"
+    },
     "checklist": {
       "type": "array",
       "description": "Lista de itens de checklist",
