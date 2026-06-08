@@ -152,6 +152,10 @@ export default function TimeBlocks() {
       queryClient.invalidateQueries({ queryKey: ['timeblocks'] });
       setShowForm(false);
     },
+    onError: (err) => {
+      console.error('Erro ao salvar bloco:', err);
+      alert('Erro ao salvar: ' + (err?.message || 'Tente novamente'));
+    },
   });
 
   const deleteMutation = useMutation({
@@ -211,6 +215,7 @@ export default function TimeBlocks() {
   };
 
   const getDuration = (start, end) => {
+    if (!start || !end) return 0;
     const [sh, sm] = start.split(':').map(Number);
     const [eh, em] = end.split(':').map(Number);
     return (eh * 60 + em) - (sh * 60 + sm);
@@ -324,7 +329,7 @@ export default function TimeBlocks() {
       <div className="space-y-2">
         {dayBlocks.map((block, i) => {
           const config = typeConfig[block.type] || typeConfig.task;
-          const duration = getDuration(block.start_time, block.end_time);
+          const duration = block.start_time && block.end_time ? getDuration(block.start_time, block.end_time) : null;
 
           return (
             <motion.div
@@ -354,7 +359,7 @@ export default function TimeBlocks() {
                       <span className={cn("text-xs px-2 py-0.5 rounded-full border", config.color)}>
                         {config.label}
                       </span>
-                      <span className="text-xs text-muted-foreground">{duration} min</span>
+                      {duration !== null && <span className="text-xs text-muted-foreground">{duration} min</span>}
                       {block.recurrence && block.recurrence !== 'none' && (
                         <span className="text-xs text-muted-foreground">
                           · {{ daily: 'Diário', weekly: 'Semanal', monthly: 'Mensal' }[block.recurrence]}
@@ -512,7 +517,7 @@ export default function TimeBlocks() {
             <Button variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
             <Button
               onClick={() => saveMutation.mutate(form)}
-              disabled={!form.title.trim() || (!form.is_template && (!form.start_time || !form.end_time)) || saveMutation.isPending}
+              disabled={!form.title.trim() || saveMutation.isPending}
             >
               {saveMutation.isPending ? 'Salvando...'
                 : editBlock ? 'Salvar'
