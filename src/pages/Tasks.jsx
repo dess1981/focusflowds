@@ -8,6 +8,7 @@ import { Plus, Search, LayoutList, Kanban, Timer, ChevronDown, ChevronUp } from 
 import TaskCard from '@/components/tasks/TaskCard';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import KanbanBoard from '@/components/tasks/KanbanBoard';
+import CategoryTimeStats from '@/components/tasks/CategoryTimeStats';
 import { AnimatePresence, motion } from 'framer-motion';
 import FocusStatsPanel from '@/components/focus/FocusStatsPanel';
 
@@ -135,6 +136,9 @@ export default function Tasks() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Category Time Stats */}
+      <CategoryTimeStats tasks={tasks} />
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
