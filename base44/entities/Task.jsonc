@@ -38,6 +38,10 @@
       "type": "string",
       "description": "ID do projeto"
     },
+    "activity_block_id": {
+      "type": "string",
+      "description": "ID do bloco de atividade (TimeBlock template) ao qual a tarefa pertence"
+    },
     "parent_task_id": {
       "type": "string",
       "description": "ID da tarefa pai (para subtarefas)"
@@ -52,11 +56,11 @@
     },
     "time_block_start": {
       "type": "string",
-      "description": "In\u00edcio do bloco de tempo (HH:mm)"
+      "description": "Hor\u00e1rio de in\u00edcio agendado (HH:mm)"
     },
     "time_block_end": {
       "type": "string",
-      "description": "Fim do bloco de tempo (HH:mm)"
+      "description": "Hor\u00e1rio de fim agendado (HH:mm)"
     },
     "estimated_minutes": {
       "type": "number",

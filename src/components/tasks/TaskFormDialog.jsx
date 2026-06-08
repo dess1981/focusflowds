@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Blocks, Clock } from 'lucide-react';
 
 const WEEK_DAYS = [
   { label: 'Dom', value: 0 },
@@ -25,6 +25,7 @@ const defaultTask = {
   due_date: '', time_block_start: '', time_block_end: '',
   estimated_minutes: '', energy_level: 'medium', category_id: '',
   project_id: '', recurrence: 'none', recurrence_days: [], recurrence_end_date: '', parent_task_id: '',
+  activity_block_id: '',
 };
 
 export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
@@ -39,6 +40,11 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.list(),
+  });
+
+  const { data: activityBlocks = [] } = useQuery({
+    queryKey: ['timeblocks-templates'],
+    queryFn: () => base44.entities.TimeBlock.filter({ is_template: true }),
   });
 
   useEffect(() => {
@@ -144,14 +150,52 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Bloco: Início</Label>
-              <Input type="time" value={form.time_block_start} onChange={e => set('time_block_start', e.target.value)} className="mt-1" />
+          {/* Activity Block OR Manual Time */}
+          <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/30">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-muted-foreground" />
+              <Label className="text-sm font-semibold">Agendamento</Label>
             </div>
+
+            {/* Activity Block */}
             <div>
-              <Label>Bloco: Fim</Label>
-              <Input type="time" value={form.time_block_end} onChange={e => set('time_block_end', e.target.value)} className="mt-1" />
+              <Label className="text-xs text-muted-foreground">Bloco de atividade</Label>
+              <Select
+                value={form.activity_block_id || 'none'}
+                onValueChange={v => set('activity_block_id', v === 'none' ? '' : v)}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Nenhum bloco" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Nenhum bloco</SelectItem>
+                  {activityBlocks.map(b => (
+                    <SelectItem key={b.id} value={b.id}>
+                      <span className="flex items-center gap-2">
+                        <span
+                          className="w-2.5 h-2.5 rounded-full inline-block"
+                          style={{ backgroundColor: b.color || '#4F6BED' }}
+                        />
+                        {b.title}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {activityBlocks.length === 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Crie blocos de atividade na página "Blocos de Tempo"
+                </p>
+              )}
+            </div>
+
+            {/* Manual time — optional, independent of block */}
+            <div>
+              <Label className="text-xs text-muted-foreground">Horário manual (opcional)</Label>
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                <Input type="time" value={form.time_block_start} onChange={e => set('time_block_start', e.target.value)} placeholder="Início" />
+                <Input type="time" value={form.time_block_end} onChange={e => set('time_block_end', e.target.value)} placeholder="Fim" />
+              </div>
             </div>
           </div>
 
