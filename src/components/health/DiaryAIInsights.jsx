@@ -15,7 +15,7 @@ export default function DiaryAIInsights() {
     setError(null);
     try {
       const response = await base44.functions.invoke('generateDiaryInsights', {});
-      setInsights(response.data.insights);
+      setInsights(response.data.success ? response.data.insights : []);
       toast.success('Insights gerados com sucesso!');
     } catch (err) {
       setError('Erro ao gerar insights. Tente novamente.');
