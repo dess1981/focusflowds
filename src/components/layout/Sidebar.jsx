@@ -7,22 +7,51 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const navItems = [
-  { path: '/', icon: CalendarDays, label: 'Planner Diário' },
-  { path: '/daily-list', icon: CheckCircle2, label: 'Lista de Hoje' },
-  { path: '/health', icon: '💚', label: 'Saúde & Bem-estar' },
-  { path: '/calendar', icon: Calendar, label: 'Calendário' },
-  { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/tasks', icon: ListTodo, label: 'Tarefas' },
-  { path: '/projects', icon: FolderKanban, label: 'Projetos' },
-  { path: '/time-blocks', icon: Clock, label: 'Blocos de Tempo' },
-  { path: '/gmail', icon: Sparkles, label: 'Gmail' },
-  { path: '/email-manager', icon: Sparkles, label: 'Gerenciador de Gmail' },
-  { path: '/categories', icon: Tag, label: 'Categorias' },
-  { path: '/templates', icon: LayoutTemplate, label: 'Templates' },
-  { path: '/reports', icon: BarChart3, label: 'Relatórios' },
-  { path: '/monthly', icon: TrendingUp, label: 'Análise Mensal' },
-  { path: '/assistant', icon: Sparkles, label: 'Assistente IA' },
+const navSections = [
+  {
+    title: 'Hoje',
+    items: [
+      { path: '/', icon: CalendarDays, label: 'Planner Diário' },
+      { path: '/daily-list', icon: CheckCircle2, label: 'Lista de Hoje' },
+    ],
+  },
+  {
+    title: 'Planejamento',
+    items: [
+      { path: '/tasks', icon: ListTodo, label: 'Tarefas' },
+      { path: '/projects', icon: FolderKanban, label: 'Projetos' },
+      { path: '/time-blocks', icon: Clock, label: 'Blocos de Tempo' },
+      { path: '/calendar', icon: Calendar, label: 'Calendário' },
+      { path: '/templates', icon: LayoutTemplate, label: 'Templates' },
+    ],
+  },
+  {
+    title: 'Saúde',
+    items: [
+      { path: '/health', icon: '💚', label: 'Saúde & Bem-estar' },
+    ],
+  },
+  {
+    title: 'Comunicação',
+    items: [
+      { path: '/email-manager', icon: Sparkles, label: 'Gerenciador de Gmail' },
+    ],
+  },
+  {
+    title: 'Análise',
+    items: [
+      { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+      { path: '/reports', icon: BarChart3, label: 'Relatórios' },
+      { path: '/monthly', icon: TrendingUp, label: 'Análise Mensal' },
+    ],
+  },
+  {
+    title: 'Configuração',
+    items: [
+      { path: '/categories', icon: Tag, label: 'Categorias' },
+      { path: '/assistant', icon: Sparkles, label: 'Assistente IA' },
+    ],
+  },
 ];
 
 export default function Sidebar() {
@@ -101,39 +130,51 @@ export default function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
-          {navItems.map(item => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
-                  collapsed && "justify-center px-0"
-                )}
-                style={isActive ? {
-                  background: 'linear-gradient(135deg, rgba(168,85,247,0.2), rgba(34,211,238,0.1))',
-                  color: '#a855f7',
-                  border: '1px solid rgba(168,85,247,0.3)',
-                  boxShadow: '0 0 16px rgba(168,85,247,0.1)',
-                } : {
-                  color: 'rgba(255,255,255,0.45)',
-                  border: '1px solid transparent',
-                }}
-              >
-                {typeof item.icon === 'string' ? (
-                   <span className="text-lg">{item.icon}</span>
-                 ) : (
-                   <item.icon
-                     className="w-[18px] h-[18px] flex-shrink-0"
-                     style={isActive ? { filter: 'drop-shadow(0 0 6px rgba(168,85,247,0.8))' } : {}}
-                   />
-                 )}
-                {!collapsed && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 px-2 py-3 space-y-4 overflow-y-auto">
+          {navSections.map(section => (
+            <div key={section.title}>
+              {!collapsed && (
+                <p className="px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider opacity-60">
+                  {section.title}
+                </p>
+              )}
+              <div className={cn("space-y-1", collapsed && "space-y-2")}>
+                {section.items.map(item => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                        collapsed && "justify-center px-0"
+                      )}
+                      style={isActive ? {
+                        background: 'linear-gradient(135deg, rgba(168,85,247,0.2), rgba(34,211,238,0.1))',
+                        color: '#a855f7',
+                        border: '1px solid rgba(168,85,247,0.3)',
+                        boxShadow: '0 0 16px rgba(168,85,247,0.1)',
+                      } : {
+                        color: 'rgba(255,255,255,0.45)',
+                        border: '1px solid transparent',
+                      }}
+                      title={collapsed ? item.label : undefined}
+                    >
+                      {typeof item.icon === 'string' ? (
+                        <span className="text-lg">{item.icon}</span>
+                      ) : (
+                        <item.icon
+                          className="w-[18px] h-[18px] flex-shrink-0"
+                          style={isActive ? { filter: 'drop-shadow(0 0 6px rgba(168,85,247,0.8))' } : {}}
+                        />
+                      )}
+                      {!collapsed && <span>{item.label}</span>}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         {/* Footer */}
