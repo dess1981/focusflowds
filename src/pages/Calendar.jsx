@@ -93,37 +93,41 @@ export default function Calendar() {
   const drawerTasks = drawerDate ? (tasksByDate[format(drawerDate, 'yyyy-MM-dd')] || []) : [];
   const drawerBlocks = drawerDate ? (blocksByDate[format(drawerDate, 'yyyy-MM-dd')] || []) : [];
 
-  const WEEK_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const WEEK_LABELS_DESKTOP = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const WEEK_LABELS_MOBILE = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-heading font-bold tracking-tight">Calendário</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            {format(currentMonth, "MMMM 'de' yyyy", { locale: ptBR })}
-          </p>
-        </div>
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={() => setCurrentMonth(m => subMonths(m, 1))}>
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setCurrentMonth(new Date())}>
-            Hoje
-          </Button>
+          <div className="text-center min-w-[120px]">
+            <h1 className="text-base sm:text-2xl font-heading font-bold tracking-tight capitalize">
+              {format(currentMonth, "MMM yyyy", { locale: ptBR })}
+            </h1>
+          </div>
           <Button variant="outline" size="icon" onClick={() => setCurrentMonth(m => addMonths(m, 1))}>
             <ChevronRight className="w-4 h-4" />
           </Button>
-          <GoogleCalendarConnectButton
-            connected={gcConnected}
-            loading={gcLoading}
-            onConnect={gcConnect}
-            onDisconnect={gcDisconnect}
-          />
-          <Button className="ml-2" onClick={() => { setSelectedDate(format(new Date(), 'yyyy-MM-dd')); setShowForm(true); }}>
-            <Plus className="w-4 h-4 mr-1.5" />
-            Nova Tarefa
+          <Button variant="outline" size="sm" className="hidden sm:inline-flex" onClick={() => setCurrentMonth(new Date())}>
+            Hoje
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:block">
+            <GoogleCalendarConnectButton
+              connected={gcConnected}
+              loading={gcLoading}
+              onConnect={gcConnect}
+              onDisconnect={gcDisconnect}
+            />
+          </div>
+          <Button size="sm" onClick={() => { setSelectedDate(format(new Date(), 'yyyy-MM-dd')); setShowForm(true); }}>
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline ml-1">Nova Tarefa</span>
           </Button>
         </div>
       </div>
@@ -132,9 +136,10 @@ export default function Calendar() {
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         {/* Week day headers */}
         <div className="grid grid-cols-7 border-b border-border">
-          {WEEK_LABELS.map(l => (
-            <div key={l} className="py-2 text-center text-xs font-semibold text-muted-foreground">
-              {l}
+          {WEEK_LABELS_DESKTOP.map((l, i) => (
+            <div key={l + i} className="py-2 text-center text-xs font-semibold text-muted-foreground">
+              <span className="hidden sm:inline">{l}</span>
+              <span className="sm:hidden">{WEEK_LABELS_MOBILE[i]}</span>
             </div>
           ))}
         </div>
@@ -149,8 +154,10 @@ export default function Calendar() {
             const isCurrentMonth = isSameMonth(day, currentMonth);
             const isCurrentDay = isToday(day);
             const hasBlocks = dayBlocks.length > 0;
-            // max visible items = gc events + blocks + tasks combined
-            const maxVisible = 3;
+            const totalItems = dayGcEvents.length + dayBlocks.length + dayTasks.length;
+
+            // Mobile: show dots only. Desktop: show text labels (max 2)
+            const maxVisible = 2;
             const visibleGcEvents = dayGcEvents.slice(0, maxVisible);
             const remainingAfterGc = Math.max(0, maxVisible - visibleGcEvents.length);
             const visibleBlocks = dayBlocks.slice(0, remainingAfterGc);
@@ -163,8 +170,8 @@ export default function Calendar() {
                 key={key}
                 onClick={() => handleDayClick(day)}
                 className={cn(
-                  "min-h-[90px] p-1.5 border-b border-r border-border cursor-pointer transition-colors",
-                  "hover:bg-muted/50",
+                  "min-h-[64px] sm:min-h-[90px] p-1 sm:p-1.5 border-b border-r border-border cursor-pointer transition-colors",
+                  "hover:bg-muted/50 active:bg-muted/70",
                   !isCurrentMonth && "bg-muted/20",
                   hasBlocks && "bg-amber-50/40 dark:bg-amber-900/10",
                   idx % 7 === 6 && "border-r-0",
@@ -173,17 +180,38 @@ export default function Calendar() {
               >
                 {/* Day number */}
                 <div className={cn(
-                  "w-7 h-7 flex items-center justify-center rounded-full text-sm font-medium mb-1",
+                  "w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full text-xs sm:text-sm font-medium mb-1",
                   isCurrentDay && "bg-primary text-primary-foreground",
-                  !isCurrentDay && !isCurrentMonth && "text-muted-foreground/50",
+                  !isCurrentDay && !isCurrentMonth && "text-muted-foreground/40",
                   !isCurrentDay && isCurrentMonth && "text-foreground"
                 )}>
                   {format(day, 'd')}
                 </div>
 
-                {/* Items */}
-                <div className="space-y-0.5">
-                  {/* Google Calendar events — shown first */}
+                {/* MOBILE: colored dots indicator */}
+                {totalItems > 0 && (
+                  <div className="flex sm:hidden flex-wrap gap-0.5 mt-1">
+                    {dayGcEvents.slice(0, 3).map((ev, i) => (
+                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
+                    ))}
+                    {dayBlocks.slice(0, 3).map((b, i) => (
+                      <div key={i} className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: b.color || '#4F6BED' }} />
+                    ))}
+                    {dayTasks.slice(0, 3).map((t, i) => (
+                      <div key={i} className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0",
+                        t.priority === 'urgent' ? 'bg-red-500' :
+                        t.priority === 'high' ? 'bg-orange-400' :
+                        t.priority === 'medium' ? 'bg-blue-500' : 'bg-slate-400'
+                      )} />
+                    ))}
+                    {totalItems > 3 && (
+                      <span className="text-[9px] text-muted-foreground leading-none">+{totalItems - 3}</span>
+                    )}
+                  </div>
+                )}
+
+                {/* DESKTOP: text labels */}
+                <div className="hidden sm:block space-y-0.5">
                   {visibleGcEvents.map(ev => {
                     const startTime = ev.start?.dateTime
                       ? format(new Date(ev.start.dateTime), 'HH:mm')
@@ -192,50 +220,33 @@ export default function Calendar() {
                       <div
                         key={ev.id}
                         className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate font-medium"
-                        style={{
-                          backgroundColor: '#EA433520',
-                          color: '#EA4335',
-                          border: '1px solid #EA433540',
-                        }}
+                        style={{ backgroundColor: '#EA433520', color: '#EA4335', border: '1px solid #EA433540' }}
                         title={`📅 ${ev.summary}${startTime ? ` ${startTime}` : ''}`}
                       >
                         <span className="truncate">{ev.summary || '(sem título)'}</span>
-                        {startTime && (
-                          <span className="ml-auto text-[10px] opacity-70 flex-shrink-0">{startTime}</span>
-                        )}
+                        {startTime && <span className="ml-auto text-[10px] opacity-70 flex-shrink-0">{startTime}</span>}
                       </div>
                     );
                   })}
 
-                  {/* Time blocks — shown as "protected" */}
                   {visibleBlocks.map(block => (
                     <div
                       key={block.id}
                       className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate font-medium"
-                      style={{
-                        backgroundColor: `${block.color || '#4F6BED'}20`,
-                        color: block.color || '#4F6BED',
-                        border: `1px solid ${block.color || '#4F6BED'}40`,
-                      }}
-                      title={`🔒 Bloco reservado: ${block.title}${block.start_time ? ` ${block.start_time}–${block.end_time}` : ''}`}
+                      style={{ backgroundColor: `${block.color || '#4F6BED'}20`, color: block.color || '#4F6BED', border: `1px solid ${block.color || '#4F6BED'}40` }}
+                      title={`🔒 ${block.title}`}
                     >
                       <Lock className="w-2.5 h-2.5 flex-shrink-0" />
                       <span className="truncate">{block.title}</span>
-                      {block.start_time && (
-                        <span className="ml-auto text-[10px] opacity-70 flex-shrink-0">{block.start_time}</span>
-                      )}
                     </div>
                   ))}
 
-                  {/* Tasks */}
                   {visibleTasks.map(task => (
                     <div
                       key={task.id}
                       className={cn(
                         "flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate",
-                        task.status === 'done'
-                          ? "bg-muted text-muted-foreground line-through"
-                          : "bg-primary/10 text-primary font-medium"
+                        task.status === 'done' ? "bg-muted text-muted-foreground line-through" : "bg-primary/10 text-primary font-medium"
                       )}
                     >
                       <div className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", priorityColors[task.priority] || 'bg-slate-400')} />
@@ -244,9 +255,7 @@ export default function Calendar() {
                   ))}
 
                   {totalHidden > 0 && (
-                    <div className="text-xs text-muted-foreground px-1">
-                      +{totalHidden} mais
-                    </div>
+                    <div className="text-xs text-muted-foreground px-1">+{totalHidden} mais</div>
                   )}
                 </div>
               </div>
