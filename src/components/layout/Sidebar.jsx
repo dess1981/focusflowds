@@ -16,6 +16,7 @@ const navItems = [
   { path: '/projects', icon: FolderKanban, label: 'Projetos' },
   { path: '/time-blocks', icon: Clock, label: 'Blocos de Tempo' },
   { path: '/gmail', icon: Sparkles, label: 'Gmail' },
+  { path: '/email-manager', icon: Sparkles, label: 'Gerenciador de Gmail' },
   { path: '/categories', icon: Tag, label: 'Categorias' },
   { path: '/templates', icon: LayoutTemplate, label: 'Templates' },
   { path: '/reports', icon: BarChart3, label: 'Relatórios' },
