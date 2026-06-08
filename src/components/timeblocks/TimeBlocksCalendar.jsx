@@ -19,7 +19,7 @@ export default function TimeBlocksCalendar({ blocks, selectedDate, onDateClick, 
   const end = endOfMonth(selectedDate);
   const days = eachDayOfInterval({ start, end });
 
-  // Agrupa blocos por data
+  // Agrupa blocos por data e calcula estatísticas
   const blocksByDate = blocks.reduce((acc, block) => {
     if (block.date) {
       if (!acc[block.date]) acc[block.date] = [];
@@ -27,6 +27,33 @@ export default function TimeBlocksCalendar({ blocks, selectedDate, onDateClick, 
     }
     return acc;
   }, {});
+
+  // Calcula distribuição percentual por dia
+  const dayStats = (dateStr) => {
+    const dayBlocks = blocksByDate[dateStr] || [];
+    const stats = {};
+    let totalMinutes = 0;
+
+    dayBlocks.forEach(block => {
+      const type = block.type || 'task';
+      if (!stats[type]) stats[type] = 0;
+      
+      if (block.start_time && block.end_time) {
+        const [sh, sm] = block.start_time.split(':').map(Number);
+        const [eh, em] = block.end_time.split(':').map(Number);
+        const minutes = (eh * 60 + em) - (sh * 60 + sm);
+        stats[type] += minutes;
+        totalMinutes += minutes;
+      }
+    });
+
+    const percentages = {};
+    Object.keys(stats).forEach(type => {
+      percentages[type] = totalMinutes > 0 ? Math.round((stats[type] / totalMinutes) * 100) : 0;
+    });
+
+    return { stats, totalMinutes, percentages };
+  };
 
   // Começa com domingo
   const firstDayOfWeek = days[0].getDay();
@@ -69,14 +96,15 @@ export default function TimeBlocksCalendar({ blocks, selectedDate, onDateClick, 
             }
 
             const dateStr = format(day, 'yyyy-MM-dd');
-            const dayBlocks = blocksByDate[dateStr] || [];
+            const stats = dayStats(dateStr);
             const isCurrentDay = isToday(day);
+            const hasBlocks = stats.totalMinutes > 0;
 
             return (
               <button
                 key={dateStr}
                 onClick={() => onDateClick(day)}
-                className={`aspect-square p-1.5 rounded-lg border transition-all flex flex-col items-center justify-start text-center ${
+                className={`aspect-square p-1.5 rounded-lg border transition-all flex flex-col justify-between ${
                   isCurrentDay
                     ? 'border-primary/50 bg-primary/10'
                     : !isSameMonth(day, selectedDate)
@@ -84,21 +112,28 @@ export default function TimeBlocksCalendar({ blocks, selectedDate, onDateClick, 
                     : 'border-border hover:border-primary/30 hover:bg-muted/50'
                 }`}
               >
-                <span className="text-xs font-medium">{format(day, 'd')}</span>
-                {dayBlocks.length > 0 && (
-                  <div className="flex gap-0.5 mt-1 flex-wrap justify-center">
-                    {dayBlocks.slice(0, 3).map((block, i) => (
-                      <div
-                        key={i}
-                        className="w-1.5 h-1.5 rounded-full"
-                        style={{ backgroundColor: typeConfig[block.type]?.hex || '#6B7280' }}
-                        title={block.title}
-                      />
-                    ))}
-                    {dayBlocks.length > 3 && (
-                      <span className="text-[8px] text-muted-foreground">+{dayBlocks.length - 3}</span>
-                    )}
+                <span className="text-xs font-medium text-start">{format(day, 'd')}</span>
+                
+                {hasBlocks ? (
+                  <div className="flex h-1.5 rounded-full overflow-hidden gap-0 bg-muted/30 w-full">
+                    {Object.entries(stats.percentages)
+                      .sort((a, b) => b[1] - a[1])
+                      .map(([type, percentage]) => 
+                        percentage > 0 ? (
+                          <div
+                            key={type}
+                            className="transition-all"
+                            style={{
+                              width: `${percentage}%`,
+                              backgroundColor: typeConfig[type]?.hex || '#6B7280',
+                            }}
+                            title={`${type}: ${percentage}%`}
+                          />
+                        ) : null
+                      )}
                   </div>
+                ) : (
+                  <div className="h-1.5 rounded-full bg-muted/20 w-full" />
                 )}
               </button>
             );
