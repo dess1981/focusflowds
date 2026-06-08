@@ -222,6 +222,7 @@ export default function Calendar() {
         title={drawerDate ? format(drawerDate, "d 'de' MMMM", { locale: ptBR }) : ''}
         tasks={drawerTasks}
         timeBlocks={drawerBlocks}
+        defaultDate={drawerDate ? format(drawerDate, 'yyyy-MM-dd') : null}
       />
 
       {/* Form: new task on selected date */}

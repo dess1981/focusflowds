@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Pencil, Lock, Clock } from 'lucide-react';
+import { Pencil, Lock, Clock, Plus } from 'lucide-react';
 import TaskCard from './TaskCard';
 import TaskFormDialog from './TaskFormDialog';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 
-export default function TaskListDrawer({ open, onOpenChange, title, color, tasks, timeBlocks = [], onEdit }) {
+export default function TaskListDrawer({ open, onOpenChange, title, color, tasks, timeBlocks = [], onEdit, defaultDate }) {
   const [editTask, setEditTask] = useState(null);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const queryClient = useQueryClient();
@@ -98,21 +98,25 @@ export default function TaskListDrawer({ open, onOpenChange, title, color, tasks
             ))}
           </div>
 
-          {onEdit && (
-            <div className="mt-6 pt-4 border-t border-border">
+          <div className="mt-6 pt-4 border-t border-border space-y-2">
+            <Button size="sm" className="w-full" onClick={() => { setEditTask(null); setShowTaskForm(true); }}>
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              Nova Tarefa
+            </Button>
+            {onEdit && (
               <Button variant="outline" size="sm" onClick={onEdit} className="w-full">
                 <Pencil className="w-3.5 h-3.5 mr-1.5" />
                 Editar
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </SheetContent>
       </Sheet>
 
       <TaskFormDialog
         open={showTaskForm}
         onOpenChange={setShowTaskForm}
-        task={editTask}
+        task={editTask || (defaultDate ? { due_date: defaultDate } : null)}
         onSave={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}
       />
     </>
