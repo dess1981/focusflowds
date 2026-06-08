@@ -93,6 +93,13 @@ export default function TimeBlocks() {
     [blocks, dateStr]
   );
 
+  const getDuration = (start, end) => {
+    if (!start || !end) return 0;
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    return (eh * 60 + em) - (sh * 60 + sm);
+  };
+
   // Calcula percentuais por tipo de bloco para o dia
   const dayStats = useMemo(() => {
     const stats = {};
@@ -259,13 +266,6 @@ export default function TimeBlocks() {
         ? f.recurrence_days.filter(d => d !== day)
         : [...f.recurrence_days, day],
     }));
-  };
-
-  const getDuration = (start, end) => {
-    if (!start || !end) return 0;
-    const [sh, sm] = start.split(':').map(Number);
-    const [eh, em] = end.split(':').map(Number);
-    return (eh * 60 + em) - (sh * 60 + sm);
   };
 
   return (
