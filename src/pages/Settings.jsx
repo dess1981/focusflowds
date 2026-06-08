@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/hooks/useLanguage';
+import ResetDataButton from '@/components/dev/ResetDataButton';
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
@@ -112,6 +113,17 @@ export default function Settings() {
               🚀 <strong>Sem espera:</strong> As mudanças são aplicadas instantaneamente.
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Reset Data - Dev */}
+      <Card className="bg-destructive/5 border-destructive/30">
+        <CardHeader>
+          <CardTitle className="text-destructive">Zona de Perigo</CardTitle>
+          <CardDescription>Ações irreversíveis</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResetDataButton />
         </CardContent>
       </Card>
     </div>
