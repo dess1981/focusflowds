@@ -49,8 +49,8 @@ export default function BottomNavCustomizer({ isOpen, onClose }) {
   };
 
   const addButton = (item) => {
-    if (customButtons.length >= 6) {
-      alert('Máximo 6 botões permitidos');
+    if (customButtons.length >= 5) {
+      alert('Máximo 5 botões permitidos');
       return;
     }
     const updated = [...customButtons, item];
@@ -86,7 +86,7 @@ export default function BottomNavCustomizer({ isOpen, onClose }) {
         <div className="grid grid-cols-2 gap-4">
           {/* Botões Selecionados */}
           <div>
-            <h3 className="font-semibold text-sm mb-3">Meus Botões ({customButtons.length}/6)</h3>
+            <h3 className="font-semibold text-sm mb-3">Meus Botões ({customButtons.length}/5)</h3>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {customButtons.map((item, idx) => (
                 <div
