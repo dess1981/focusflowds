@@ -3,13 +3,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, CalendarDays, ListTodo, FolderKanban, 
   Clock, Settings, ChevronLeft, ChevronRight, Plus, 
-  Sparkles, Tag, Menu, X
+  Sparkles, Tag, Menu, X, Calendar
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { path: '/', icon: CalendarDays, label: 'Planner Diário' },
+  { path: '/calendar', icon: Calendar, label: 'Calendário' },
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/tasks', icon: ListTodo, label: 'Tarefas' },
   { path: '/projects', icon: FolderKanban, label: 'Projetos' },
