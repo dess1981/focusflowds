@@ -5,10 +5,11 @@ import { format, addDays, subDays, isToday, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ChevronLeft, ChevronRight, Plus, CalendarDays, Sun, Sunrise, Moon, Sparkles, Search, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, CalendarDays, Sun, Sunrise, Moon, Sparkles, Search, X, HardDrive } from 'lucide-react';
 import TaskCard from '@/components/tasks/TaskCard';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import SmartNotifications from '@/components/SmartNotifications';
+import DriveQuickSearch from '@/components/tasks/DriveQuickSearch';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -180,6 +181,9 @@ export default function DailyPlanner() {
 
       {/* Smart Notifications — only on today's view */}
       {isToday(selectedDate) && <SmartNotifications />}
+
+      {/* Quick Drive Search */}
+      <DriveQuickSearch />
 
       {/* Progress Bar */}
       <div
