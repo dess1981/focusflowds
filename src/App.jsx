@@ -12,6 +12,7 @@ import { FocusTimerProvider } from '@/context/FocusTimerContext';
 import { FocusModeProvider } from '@/context/FocusModeContext';
 
 // Pages
+import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import DailyPlanner from './pages/DailyPlanner';
 import Tasks from './pages/Tasks';
@@ -66,7 +67,7 @@ const AuthenticatedApp = () => {
 
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<DailyPlanner />} />
+          <Route path="/" element={<Home />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/tasks" element={<Tasks />} />
