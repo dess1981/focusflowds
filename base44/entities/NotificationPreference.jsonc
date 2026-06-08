@@ -33,5 +33,19 @@
       "description": "Minutos de anteced\u00eancia para medicamentos (10, 30 ou 60)"
     }
   },
-  "required": []
+  "required": [],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
 }
