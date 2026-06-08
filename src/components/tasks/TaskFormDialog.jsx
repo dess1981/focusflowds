@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
-import { RefreshCw, Blocks, Clock } from 'lucide-react';
+import { RefreshCw, Clock, Video, ExternalLink, Copy } from 'lucide-react';
 
 const WEEK_DAYS = [
   { label: 'Dom', value: 0 },
@@ -22,11 +22,18 @@ const WEEK_DAYS = [
 
 const defaultTask = {
   title: '', description: '', status: 'todo', priority: 'medium',
+  task_type: 'task', meet_link: '',
   due_date: '', time_block_start: '', time_block_end: '',
   estimated_minutes: '', energy_level: 'medium', category_id: '',
   project_id: '', recurrence: 'none', recurrence_days: [], recurrence_end_date: '', parent_task_id: '',
   activity_block_id: '',
 };
+
+function generateMeetLink() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz';
+  const seg = (n) => Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  return `https://meet.google.com/${seg(3)}-${seg(4)}-${seg(3)}`;
+}
 
 export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
   const [form, setForm] = useState(defaultTask);
@@ -107,6 +114,83 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
               className="mt-1"
             />
           </div>
+
+          {/* Task type selector */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => set('task_type', 'task')}
+              className={cn(
+                "flex-1 py-2 rounded-xl text-sm font-medium border transition-all",
+                form.task_type === 'task'
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-muted/30 border-border text-muted-foreground hover:border-primary/50"
+              )}
+            >
+              📋 Tarefa
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const link = generateMeetLink();
+                setForm(f => ({ ...f, task_type: 'meeting', meet_link: f.meet_link || link }));
+              }}
+              className={cn(
+                "flex-1 py-2 rounded-xl text-sm font-medium border transition-all flex items-center justify-center gap-1.5",
+                form.task_type === 'meeting'
+                  ? "border-[#22d3ee] text-[#22d3ee]"
+                  : "bg-muted/30 border-border text-muted-foreground hover:border-[#22d3ee]/50"
+              )}
+              style={form.task_type === 'meeting' ? { background: 'rgba(34,211,238,0.1)' } : {}}
+            >
+              <Video className="w-3.5 h-3.5" /> Reunião
+            </button>
+          </div>
+
+          {/* Meet link — shown only for meeting type */}
+          {form.task_type === 'meeting' && (
+            <div
+              className="rounded-xl p-3 space-y-2"
+              style={{ background: 'rgba(34,211,238,0.08)', border: '1px solid rgba(34,211,238,0.25)' }}
+            >
+              <div className="flex items-center gap-2">
+                <Video className="w-4 h-4" style={{ color: '#22d3ee' }} />
+                <span className="text-sm font-semibold" style={{ color: '#22d3ee' }}>Link Google Meet</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  value={form.meet_link}
+                  onChange={e => set('meet_link', e.target.value)}
+                  className="font-mono text-xs h-8"
+                  placeholder="https://meet.google.com/..."
+                />
+                <button
+                  type="button"
+                  title="Copiar link"
+                  onClick={() => navigator.clipboard.writeText(form.meet_link)}
+                  className="p-1.5 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0"
+                >
+                  <Copy className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <a
+                  href={form.meet_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0"
+                  title="Abrir reunião"
+                >
+                  <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                </a>
+              </div>
+              <button
+                type="button"
+                onClick={() => set('meet_link', generateMeetLink())}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                🔄 Gerar novo link
+              </button>
+            </div>
+          )}
 
           <div>
             <Label>Descrição</Label>

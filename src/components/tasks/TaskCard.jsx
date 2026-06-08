@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Clock, Calendar, ChevronRight, Zap } from 'lucide-react';
+import { Clock, Calendar, ChevronRight, Video } from 'lucide-react';
 import PriorityBadge from './PriorityBadge';
 import StatusBadge from './StatusBadge';
 import { format } from 'date-fns';
@@ -87,6 +87,24 @@ export default function TaskCard({ task, onStatusChange, onClick, compact = fals
             </span>
           )}
         </div>
+
+        {task.task_type === 'meeting' && task.meet_link && (
+          <a
+            href={task.meet_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg transition-colors"
+            style={{
+              background: 'rgba(34,211,238,0.12)',
+              color: '#22d3ee',
+              border: '1px solid rgba(34,211,238,0.25)',
+            }}
+          >
+            <Video className="w-3 h-3" />
+            Entrar na reunião
+          </a>
+        )}
       </div>
 
       <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity mt-1" />

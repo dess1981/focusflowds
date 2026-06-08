@@ -30,6 +30,19 @@
       ],
       "default": "medium"
     },
+    "task_type": {
+      "type": "string",
+      "enum": [
+        "task",
+        "meeting"
+      ],
+      "default": "task",
+      "description": "Tipo da tarefa \u2014 'meeting' gera link do Google Meet automaticamente"
+    },
+    "meet_link": {
+      "type": "string",
+      "description": "Link do Google Meet gerado para reuni\u00f5es"
+    },
     "category_id": {
       "type": "string",
       "description": "ID da categoria"
