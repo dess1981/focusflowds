@@ -127,12 +127,14 @@ Keep each section to 2-3 sentences. Be specific with day suggestions and energy-
       },
     });
 
+    const insights = response.insights || response?.data?.insights || [];
     return Response.json({
       success: true,
-      insights: response.insights || [],
+      insights: Array.isArray(insights) ? insights : [],
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('generateDiaryInsights error:', error);
+    return Response.json({ error: error.message || 'Failed to generate insights' }, { status: 500 });
   }
 });
