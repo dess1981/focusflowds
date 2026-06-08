@@ -13,7 +13,7 @@ import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFocusTimer } from '@/context/FocusTimerContext';
-import HealthHub from '@/components/health/HealthHub';
+import DailyDiaryPanel from '@/components/health/DailyDiaryPanel';
 
 const priorityConfig = {
   urgent: { label: '🔴 Urgente', color: '#ef4444', sortOrder: 0 },
@@ -238,12 +238,12 @@ export default function DailyTaskList() {
         </div>
       </motion.div>
 
-      {/* Health Hub */}
+      {/* Daily Diary */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <HealthHub />
+        <DailyDiaryPanel />
       </motion.div>
 
       {/* Task list */}

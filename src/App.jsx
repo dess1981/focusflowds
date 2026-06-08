@@ -23,6 +23,7 @@ import Templates from './pages/Templates';
 import Reports from './pages/Reports';
 import MonthlyDashboard from './pages/MonthlyDashboard';
 import DailyTaskList from './pages/DailyTaskList';
+import Health from './pages/Health';
 import GmailIntegration from './pages/GmailIntegration';
 import EmailManager from './pages/EmailManager';
 import Login from './pages/Login';
@@ -71,6 +72,7 @@ const AuthenticatedApp = () => {
           <Route path="/reports" element={<Reports />} />
           <Route path="/monthly" element={<MonthlyDashboard />} />
           <Route path="/daily-list" element={<DailyTaskList />} />
+          <Route path="/health" element={<Health />} />
           <Route path="/gmail" element={<GmailIntegration />} />
           <Route path="/email-manager" element={<EmailManager />} />
         </Route>

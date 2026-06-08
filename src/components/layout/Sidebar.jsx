@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { path: '/', icon: CalendarDays, label: 'Planner Diário' },
   { path: '/daily-list', icon: CheckCircle2, label: 'Lista de Hoje' },
+  { path: '/health', icon: '💚', label: 'Saúde & Bem-estar' },
   { path: '/calendar', icon: Calendar, label: 'Calendário' },
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/tasks', icon: ListTodo, label: 'Tarefas' },
@@ -121,10 +122,14 @@ export default function Sidebar() {
                   border: '1px solid transparent',
                 }}
               >
-                <item.icon
-                  className="w-[18px] h-[18px] flex-shrink-0"
-                  style={isActive ? { filter: 'drop-shadow(0 0 6px rgba(168,85,247,0.8))' } : {}}
-                />
+                {typeof item.icon === 'string' ? (
+                   <span className="text-lg">{item.icon}</span>
+                 ) : (
+                   <item.icon
+                     className="w-[18px] h-[18px] flex-shrink-0"
+                     style={isActive ? { filter: 'drop-shadow(0 0 6px rgba(168,85,247,0.8))' } : {}}
+                   />
+                 )}
                 {!collapsed && <span>{item.label}</span>}
               </Link>
             );
