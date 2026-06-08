@@ -1,4 +1,9 @@
+// DEPRECATED: Use syncEventToGoogleCalendar.js instead
+// Keeping for backwards compatibility with existing automations
+
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+
+const CONNECTOR_ID = '69d7d8d3b259ef293513995d';
 
 Deno.serve(async (req) => {
   try {
@@ -9,10 +14,10 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { event, body } = await req.json();
+    const { event } = await req.json();
 
-    // Get the Google Calendar connection
-    const { accessToken } = await base44.asServiceRole.connectors.getConnection('googlecalendar');
+    // Get the Google Calendar connection (use app user connection)
+    const { accessToken } = await base44.asServiceRole.connectors.getCurrentAppUserConnection(CONNECTOR_ID);
 
     // Create event in Google Calendar
     const calendarEvent = {
@@ -27,7 +32,7 @@ Deno.serve(async (req) => {
         timeZone: 'America/New_York',
       },
       colorId: mapColorToGoogleColorId(event.color),
-      transparency: 'opaque', // Block time
+      transparency: 'opaque',
       visibility: 'private',
     };
 
@@ -61,14 +66,13 @@ Deno.serve(async (req) => {
 });
 
 function mapColorToGoogleColorId(hexColor) {
-  // Map custom colors to Google Calendar color IDs (1-11)
   const colorMap = {
-    '#4F6BED': '7', // Blueberry
-    '#a855f7': '5', // Grape
-    '#22d3ee': '6', // Peacock
-    '#ec4899': '4', // Flamingo
-    '#f97316': '17', // Tangerine
-    '#eab308': '5', // Banana
+    '#4F6BED': '7',
+    '#a855f7': '5',
+    '#22d3ee': '6',
+    '#ec4899': '4',
+    '#f97316': '17',
+    '#eab308': '5',
   };
   return colorMap[hexColor?.toLowerCase()] || '7';
 }
