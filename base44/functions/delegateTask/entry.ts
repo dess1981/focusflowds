@@ -29,32 +29,38 @@ Deno.serve(async (req) => {
       delegation_token: delegationToken
     });
 
-    // Send delegation email
-    const appUrl = Deno.env.get('APP_URL') || 'https://focusflow.app';
-    const delegationLink = `${appUrl}/delegation?token=${delegationToken}&taskId=${taskId}`;
-
+    // Send delegation email via SendEmail integration
     const emailBody = `
 Olá,
 
 ${user.full_name} delegou uma tarefa para você:
 
-<strong>Tarefa:</strong> ${task.title}
-<strong>Descrição:</strong> ${task.description || 'N/A'}
-<strong>Prioridade:</strong> ${task.priority}
-<strong>Data de entrega:</strong> ${task.due_date || 'N/A'}
-<strong>Tempo estimado:</strong> ${task.estimated_minutes || 'N/A'} minutos
+**Tarefa:** ${task.title}
+**Descrição:** ${task.description || 'N/A'}
+**Prioridade:** ${task.priority}
+**Data de entrega:** ${task.due_date || 'N/A'}
+**Tempo estimado:** ${task.estimated_minutes || 'N/A'} minutos
 
-Para visualizar todos os detalhes e registrar seu acompanhamento, clique aqui:
-${delegationLink}
+---
 
-Você receberá um email de confirmação quando a tarefa for completada.
+Clique no link abaixo para visualizar os detalhes completos e marcar como concluído quando terminar.
+
+Status da tarefa: **${task.status}**
 
 Obrigado!
     `;
 
-    // TODO: Use email service to send delegationLink
-    console.log(`Sending delegation email to ${delegatedTo}`);
-    console.log('Delegation Link:', delegationLink);
+    try {
+      await base44.asServiceRole.integrations.Core.SendEmail({
+        to: delegatedTo,
+        subject: `Tarefa delegada: ${task.title}`,
+        html: emailBody.replace(/\n/g, '<br />')
+      });
+      console.log(`Delegation email sent to ${delegatedTo}`);
+    } catch (emailError) {
+      console.error('Failed to send delegation email:', emailError);
+      // Don't fail the delegation if email fails
+    }
 
     // Create followup task if requested
     if (createFollowup) {
