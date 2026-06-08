@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, LayoutList, Kanban, Timer, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Search, LayoutList, Kanban, Timer, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
 import TaskCard from '@/components/tasks/TaskCard';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import KanbanBoard from '@/components/tasks/KanbanBoard';
@@ -20,6 +20,7 @@ export default function Tasks() {
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [view, setView] = useState('list');
   const [showStats, setShowStats] = useState(false);
+  const [hideConcluded, setHideConcluded] = useState(false);
   const queryClient = useQueryClient();
 
   // Check for ?new=true
@@ -61,9 +62,10 @@ export default function Tasks() {
       if (search && !t.title.toLowerCase().includes(search.toLowerCase())) return false;
       if (statusFilter !== 'all' && t.status !== statusFilter) return false;
       if (priorityFilter !== 'all' && t.priority !== priorityFilter) return false;
+      if (hideConcluded && t.status === 'done') return false;
       return true;
     });
-  }, [tasks, search, statusFilter, priorityFilter]);
+  }, [tasks, search, statusFilter, priorityFilter, hideConcluded]);
 
   const projectMap = useMemo(() => {
     const map = {};
@@ -167,16 +169,38 @@ export default function Tasks() {
           </SelectContent>
         </Select>
         <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-          <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Prioridade</SelectItem>
-            <SelectItem value="urgent">Urgente</SelectItem>
-            <SelectItem value="high">Alta</SelectItem>
-            <SelectItem value="medium">Média</SelectItem>
-            <SelectItem value="low">Baixa</SelectItem>
-          </SelectContent>
+        <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Prioridade</SelectItem>
+          <SelectItem value="urgent">Urgente</SelectItem>
+          <SelectItem value="high">Alta</SelectItem>
+          <SelectItem value="medium">Média</SelectItem>
+          <SelectItem value="low">Baixa</SelectItem>
+        </SelectContent>
         </Select>
-      </div>
+        <button
+        onClick={() => setHideConcluded(!hideConcluded)}
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all border"
+        style={{
+          background: hideConcluded ? 'rgba(34,211,238,0.1)' : 'rgba(255,255,255,0.05)',
+          borderColor: hideConcluded ? 'rgba(34,211,238,0.3)' : 'rgba(255,255,255,0.1)',
+          color: hideConcluded ? '#06b6d4' : 'rgba(255,255,255,0.6)',
+        }}
+        title={hideConcluded ? 'Mostrando tarefas ativas' : 'Mostrando todas as tarefas'}
+        >
+        {hideConcluded ? (
+          <>
+            <EyeOff className="w-3.5 h-3.5" />
+            Sem Concluídas
+          </>
+        ) : (
+          <>
+            <Eye className="w-3.5 h-3.5" />
+            Mostrar Todas
+          </>
+        )}
+        </button>
+        </div>
 
       {/* Task Views */}
       {view === 'kanban' ? (
