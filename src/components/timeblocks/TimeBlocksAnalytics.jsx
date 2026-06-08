@@ -95,8 +95,8 @@ export default function TimeBlocksAnalytics({ blocks, selectedDate }) {
   return (
     <div className="space-y-6">
       {/* Filtros */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-        <div>
+      <div className="space-y-3">
+        <div className="w-full sm:w-48">
           <Label className="text-xs">Período</Label>
           <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
@@ -110,7 +110,7 @@ export default function TimeBlocksAnalytics({ blocks, selectedDate }) {
         </div>
 
         {period === 'custom' && (
-          <>
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <Label className="text-xs">De</Label>
               <Input
@@ -129,7 +129,7 @@ export default function TimeBlocksAnalytics({ blocks, selectedDate }) {
                 className="mt-1"
               />
             </div>
-          </>
+          </div>
         )}
       </div>
 
