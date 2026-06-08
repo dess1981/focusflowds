@@ -226,7 +226,11 @@ export default function TimeBlocks() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-heading font-bold tracking-tight">Blocos de Tempo</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">Organize seu dia em blocos de atividade</p>
+          <p className="text-muted-foreground text-sm mt-0.5">
+            {activeTab === 'day' 
+              ? '📅 Crie blocos para organizar sua agenda' 
+              : '🎨 Crie modelos reutilizáveis (ex: "Financeiro", "Reuniões")'}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {activeTab === 'day' && (
@@ -249,6 +253,53 @@ export default function TimeBlocks() {
         </div>
       </div>
 
+      {/* Info Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Card 
+          className={cn(
+            "cursor-pointer transition-all border-2",
+            activeTab === 'day' 
+              ? 'border-primary bg-primary/5' 
+              : 'border-border hover:border-primary/50'
+          )}
+          onClick={() => setActiveTab('day')}
+        >
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <Calendar className="w-5 h-5 text-primary mt-1" />
+              <div>
+                <h3 className="font-semibold text-sm">Plano do Dia</h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Blocos agendados para <strong>hoje específico</strong>. Defina data, horário início/fim.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className={cn(
+            "cursor-pointer transition-all border-2",
+            activeTab === 'templates' 
+              ? 'border-primary bg-primary/5' 
+              : 'border-border hover:border-primary/50'
+          )}
+          onClick={() => setActiveTab('templates')}
+        >
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <Layers className="w-5 h-5 text-primary mt-1" />
+              <div>
+                <h3 className="font-semibold text-sm">Modelos (Templates)</h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Crie categorias <strong>reutilizáveis</strong> sem data/horário (ex: "Financeiro").
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Tabs */}
       <div className="flex gap-1 bg-muted/50 p-1 rounded-xl w-fit">
         <button
@@ -269,7 +320,7 @@ export default function TimeBlocks() {
           )}
         >
           <Layers className="w-4 h-4" />
-          Blocos de Atividade
+          Modelos
           {templateBlocks.length > 0 && (
             <span className="bg-primary/10 text-primary text-xs px-1.5 rounded-full">{templateBlocks.length}</span>
           )}
@@ -311,13 +362,20 @@ export default function TimeBlocks() {
             );
           })}
           {templateBlocks.length === 0 && (
-            <div className="text-center py-16">
+            <div className="text-center py-16 border border-dashed border-border rounded-xl bg-muted/30">
               <Layers className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
-              <p className="text-muted-foreground">Nenhum bloco de atividade criado</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">Crie blocos como "Financeiro", "Reuniões", "Estudo" para organizar suas tarefas</p>
-              <Button className="mt-4" variant="outline" onClick={() => openForm(null, true)}>
+              <p className="text-muted-foreground font-medium">Nenhum modelo criado</p>
+              <p className="text-sm text-muted-foreground/70 mt-2 max-w-md mx-auto">
+                💡 Modelos são <strong>categorias reutilizáveis</strong>. Use para organizar tipos de tarefas:
+              </p>
+              <div className="text-sm text-muted-foreground/70 mt-3 space-y-1">
+                <p>📚 Estudo</p>
+                <p>💼 Financeiro</p>
+                <p>👥 Reuniões</p>
+              </div>
+              <Button className="mt-6" onClick={() => openForm(null, true)}>
                 <Plus className="w-4 h-4 mr-1.5" />
-                Criar Bloco de Atividade
+                Criar Primeiro Modelo
               </Button>
             </div>
           )}
