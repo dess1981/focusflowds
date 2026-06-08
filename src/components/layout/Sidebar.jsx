@@ -5,58 +5,60 @@ import {
   Clock, Settings, ChevronLeft, ChevronRight, Plus, 
   Sparkles, Tag, X, Calendar, LayoutTemplate, BarChart3, TrendingUp, CheckCircle2, Heart
 } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 import { cn } from '@/lib/utils';
-
-const navSections = [
-  {
-    title: 'Hoje',
-    items: [
-      { path: '/', icon: CalendarDays, label: 'Planner Diário' },
-      { path: '/daily-list', icon: CheckCircle2, label: 'Lista de Hoje' },
-    ],
-  },
-  {
-    title: 'Planejamento',
-    items: [
-      { path: '/tasks', icon: ListTodo, label: 'Tarefas' },
-      { path: '/projects', icon: FolderKanban, label: 'Projetos' },
-      { path: '/time-blocks', icon: Clock, label: 'Blocos de Tempo' },
-      { path: '/calendar', icon: Calendar, label: 'Calendário' },
-      { path: '/templates', icon: LayoutTemplate, label: 'Templates' },
-    ],
-  },
-  {
-    title: 'Saúde',
-    items: [
-      { path: '/health', icon: Heart, label: 'Saúde & Bem-estar' },
-    ],
-  },
-  {
-    title: 'Comunicação',
-    items: [
-      { path: '/email-manager', icon: Sparkles, label: 'Gerenciador de Gmail' },
-    ],
-  },
-  {
-    title: 'Análise',
-    items: [
-      { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-      { path: '/reports', icon: BarChart3, label: 'Relatórios' },
-      { path: '/monthly', icon: TrendingUp, label: 'Análise Mensal' },
-    ],
-  },
-  {
-    title: 'Configuração',
-    items: [
-      { path: '/categories', icon: Tag, label: 'Categorias' },
-      { path: '/assistant', icon: Sparkles, label: 'Assistente IA' },
-    ],
-  },
-];
 
 export default function Sidebar({ isMobileSheet = false }) {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const { language, t } = useLanguage();
+
+  const navSections = [
+    {
+      title: language === 'en' ? 'Today' : 'Hoje',
+      items: [
+        { path: '/', icon: CalendarDays, label: language === 'en' ? 'Daily Planner' : 'Planner Diário' },
+        { path: '/daily-list', icon: CheckCircle2, label: language === 'en' ? 'Today\'s List' : 'Lista de Hoje' },
+      ],
+    },
+    {
+      title: language === 'en' ? 'Planning' : 'Planejamento',
+      items: [
+        { path: '/tasks', icon: ListTodo, label: language === 'en' ? 'Tasks' : 'Tarefas' },
+        { path: '/projects', icon: FolderKanban, label: language === 'en' ? 'Projects' : 'Projetos' },
+        { path: '/time-blocks', icon: Clock, label: language === 'en' ? 'Time Blocks' : 'Blocos de Tempo' },
+        { path: '/calendar', icon: Calendar, label: language === 'en' ? 'Calendar' : 'Calendário' },
+        { path: '/templates', icon: LayoutTemplate, label: language === 'en' ? 'Templates' : 'Templates' },
+      ],
+    },
+    {
+      title: language === 'en' ? 'Health' : 'Saúde',
+      items: [
+        { path: '/health', icon: Heart, label: language === 'en' ? 'Health & Wellness' : 'Saúde & Bem-estar' },
+      ],
+    },
+    {
+      title: language === 'en' ? 'Communication' : 'Comunicação',
+      items: [
+        { path: '/email-manager', icon: Sparkles, label: language === 'en' ? 'Gmail Manager' : 'Gerenciador de Gmail' },
+      ],
+    },
+    {
+      title: language === 'en' ? 'Analytics' : 'Análise',
+      items: [
+        { path: '/dashboard', icon: LayoutDashboard, label: language === 'en' ? 'Dashboard' : 'Dashboard' },
+        { path: '/reports', icon: BarChart3, label: language === 'en' ? 'Reports' : 'Relatórios' },
+        { path: '/monthly', icon: TrendingUp, label: language === 'en' ? 'Monthly Analysis' : 'Análise Mensal' },
+      ],
+    },
+    {
+      title: language === 'en' ? 'Settings' : 'Configuração',
+      items: [
+        { path: '/categories', icon: Tag, label: language === 'en' ? 'Categories' : 'Categorias' },
+        { path: '/assistant', icon: Sparkles, label: language === 'en' ? 'AI Assistant' : 'Assistente IA' },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -128,7 +130,7 @@ export default function Sidebar({ isMobileSheet = false }) {
               }}
             >
               <Plus className="w-4 h-4 flex-shrink-0" />
-              {!collapsed && <span>Nova Tarefa</span>}
+              {!collapsed && <span>{language === 'en' ? 'New Task' : 'Nova Tarefa'}</span>}
               </button>
               </Link>
               </div>
@@ -193,7 +195,7 @@ export default function Sidebar({ isMobileSheet = false }) {
             style={{ color: 'rgba(255,255,255,0.35)' }}
           >
             <Settings className="w-[18px] h-[18px]" />
-            {!collapsed && <span>Configurações</span>}
+            {!collapsed && <span>{language === 'en' ? 'Settings' : 'Configurações'}</span>}
           </Link>
         </div>
       </aside>
