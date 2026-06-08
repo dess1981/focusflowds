@@ -15,11 +15,13 @@ export default function DiaryAIInsights() {
     setError(null);
     try {
       const response = await base44.functions.invoke('generateDiaryInsights', {});
-      setInsights(response.data.success ? response.data.insights : []);
+      const insightsData = response.data?.insights || response.insights || [];
+      setInsights(Array.isArray(insightsData) ? insightsData : []);
       toast.success('Insights gerados com sucesso!');
     } catch (err) {
-      setError('Erro ao gerar insights. Tente novamente.');
-      toast.error('Erro ao gerar insights');
+      const errorMsg = err?.response?.data?.error || err?.message || 'Erro desconhecido';
+      setError(`Erro ao gerar insights: ${errorMsg}`);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }

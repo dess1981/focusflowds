@@ -109,7 +109,11 @@ export default function MedicalAppointmentsPanel() {
             <div className="space-y-2">
               <h4 className="text-xs font-semibold text-muted-foreground">PRÓXIMAS CONSULTAS</h4>
               {upcomingAppointments.map(appt => (
-                <div key={appt.id} className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 space-y-1.5">
+                <div 
+                  key={appt.id} 
+                  className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 space-y-1.5 cursor-pointer transition-all hover:bg-blue-500/15 hover:border-blue-500/30"
+                  onClick={() => openForm(appt)}
+                >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
                       <p className="text-sm font-medium">{appt.doctor_name}</p>
