@@ -93,6 +93,39 @@
     --warning: 35 85% 55%;
     --info: 190 80% 55%;
   }
+
+  /* Tema Roxo */
+  .purple-theme {
+    --primary: 280 85% 60%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 320 75% 55%;
+    --chart-1: 280 85% 60%;
+    --chart-2: 320 75% 55%;
+    --sidebar-primary: 280 85% 60%;
+    --ring: 280 85% 60%;
+  }
+
+  /* Tema Ciano */
+  .cyan-theme {
+    --primary: 180 80% 50%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 270 70% 55%;
+    --chart-1: 180 80% 50%;
+    --chart-2: 270 70% 55%;
+    --sidebar-primary: 180 80% 50%;
+    --ring: 180 80% 50%;
+  }
+
+  /* Tema Floresta */
+  .forest-theme {
+    --primary: 150 60% 45%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 120 70% 50%;
+    --chart-1: 150 60% 45%;
+    --chart-2: 120 70% 50%;
+    --sidebar-primary: 150 60% 45%;
+    --ring: 150 60% 45%;
+  }
 }
 
 @layer base {

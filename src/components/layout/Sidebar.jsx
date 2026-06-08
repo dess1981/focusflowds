@@ -6,6 +6,8 @@ import {
   Sparkles, Tag, X, Calendar, LayoutTemplate, BarChart3, TrendingUp, CheckCircle2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ThemeLanguageSelector from '@/components/ThemeLanguageSelector';
+import { useTheme } from '@/hooks/useTheme';
 
 const navSections = [
   {
@@ -57,6 +59,7 @@ const navSections = [
 export default function Sidebar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  useTheme(); // Inicializa tema
 
   return (
     <>
@@ -178,7 +181,8 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="p-3 space-y-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          {!collapsed && <ThemeLanguageSelector />}
           <Link
             to="/settings"
             className={cn(
