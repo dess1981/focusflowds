@@ -45,7 +45,22 @@ export default function HealthNotificationSettings() {
   }
 
   if (!preferences) {
-    return null;
+    return (
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="w-5 h-5 text-primary" />
+            Notificações de Saúde
+          </CardTitle>
+          <CardDescription>
+            Configure lembretes por notificação push
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Inicializando preferências...</p>
+        </CardContent>
+      </Card>
+    );
   }
 
   const handleToggle = (field) => {
