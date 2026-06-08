@@ -28,7 +28,17 @@ Deno.serve(async (req) => {
 
     // Fetch tasks
     const tasks = await base44.entities.Task.list('-created_date', 100);
-    const recentTasks = tasks.filter(t => t.due_date >= sevenDaysAgo);
+    const nextSevenDaysDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const pendingTasks = tasks.filter(t => 
+      t.status !== 'done' && 
+      t.due_date && 
+      t.due_date <= nextSevenDaysDate &&
+      t.due_date >= today
+    );
+
+    // Fetch time blocks
+    const timeBlocks = await base44.entities.TimeBlock.list('-created_date', 100);
+    const nextWeekBlocks = timeBlocks.filter(tb => tb.date && tb.date <= nextSevenDaysDate && tb.date >= today);
 
     // Construct context for LLM
     const context = {
@@ -53,37 +63,49 @@ Deno.serve(async (req) => {
         date: a.date,
         time: a.time,
       })),
-      recentTasks: recentTasks.slice(0, 10).map(t => ({
+      pendingTasks: pendingTasks.slice(0, 10).map(t => ({
         title: t.title,
         status: t.status,
         priority: t.priority,
         dueDate: t.due_date,
+        estimatedMinutes: t.estimated_minutes,
+        energyLevel: t.energy_level,
+      })),
+      timeBlocks: nextWeekBlocks.slice(0, 15).map(tb => ({
+        title: tb.title,
+        date: tb.date,
+        startTime: tb.start_time,
+        endTime: tb.end_time,
+        type: tb.type,
       })),
     };
 
-    const prompt = `You are a compassionate and insightful wellness coach analyzing a user's diary, health records, and productivity patterns.
+    const prompt = `You are a compassionate productivity coach analyzing a user's diary, health records, pending tasks, and weekly time blocks.
 
-Based on the following 7-day history, provide personalized insights and actionable suggestions:
+Based on the following information, provide personalized insights and a strategic time-blocking recommendation:
 
-**Diary Entries & Moods:**
-${context.diaryEntries.map(e => `- ${e.date} (${e.mood}): "${e.diary?.substring(0, 100)}..."`).join('\n')}
+**Diary Entries & Moods (Last 7 days):**
+${context.diaryEntries.map(e => `- ${e.date} (${e.mood}): "${e.diary?.substring(0, 80)}..."`).join('\n')}
 
 **Medications:**
-${context.medications.map(m => `- ${m.name} ${m.dosage} (${m.frequency})`).join('\n')}
+${context.medications.map(m => `- ${m.name} ${m.dosage} (${m.frequency})`).join('\n')} | Adherence: ${context.medicationAdherence.taken}/${context.medicationAdherence.total}
 
-**Medication Adherence:** ${context.medicationAdherence.taken}/${context.medicationAdherence.total} doses taken
+**Upcoming Appointments (Next 7 days):**
+${context.upcomingAppointments.map(a => `- ${a.date} ${a.time}: ${a.doctor} (${a.specialty})`).join('\n') || 'Nenhuma agendada'}
 
-**Upcoming Appointments:**
-${context.upcomingAppointments.map(a => `- ${a.date} ${a.time}: ${a.doctor} (${a.specialty})`).join('\n')}
+**Pending Tasks (Due this week):**
+${context.pendingTasks.map(t => `- [${t.priority}] ${t.title} (Due: ${t.dueDate}, Energy: ${t.energyLevel || 'medium'}, ~${t.estimatedMinutes || '?'} min)`).join('\n') || 'Nenhuma tarefa pendente'}
 
-**Recent Tasks:** ${context.recentTasks.length} tasks (${context.recentTasks.filter(t => t.status === 'done').length} completed)
+**Current Time Blocks (Next 7 days):**
+${context.timeBlocks.map(tb => `- ${tb.date} ${tb.startTime || 'TBD'}: ${tb.title} (${tb.type})`).join('\n') || 'Nenhum bloco agendado'}
 
-Provide 2-3 concise, actionable insights in Portuguese. Format as:
-1. **Observation:** [What you notice about patterns]
-2. **Suggestion:** [A specific, practical recommendation]
-3. **Quick Win:** [One easy action they can take today/this week]
+Provide insights and time-blocking recommendations in Portuguese:
 
-Keep each insight to 2 sentences max. Be encouraging and supportive.`;
+1. **📊 Priority Analysis:** Analyze which pending tasks should be tackled first based on priority and deadline.
+2. **⏰ Time-Blocking Strategy:** Suggest how to distribute these tasks across the next 7 days, considering energy levels, appointments, and medication times.
+3. **⚡ Energy-Optimized Schedule:** Recommend when high-energy vs. low-energy tasks should be scheduled based on the user's mood patterns.
+
+Keep each section to 2-3 sentences. Be specific with day suggestions and energy-task matching. Be encouraging!`;
 
     const response = await base44.integrations.Core.InvokeLLM({
       prompt,
@@ -97,9 +119,7 @@ Keep each insight to 2 sentences max. Be encouraging and supportive.`;
               type: 'object',
               properties: {
                 title: { type: 'string' },
-                observation: { type: 'string' },
-                suggestion: { type: 'string' },
-                action: { type: 'string' },
+                content: { type: 'string' },
               },
             },
           },

@@ -53,12 +53,12 @@ export default function DiaryAIInsights() {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Analisando seu histórico...
+                Analisando tarefas e blocos de tempo...
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4 mr-2" />
-                Gerar Análise e Recomendações
+                Analisar Semana & Priorizar Tempo
               </>
             )}
           </Button>
@@ -66,33 +66,18 @@ export default function DiaryAIInsights() {
           <div className="space-y-3">
             {insights.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">
-                Nenhum insight disponível no momento. Tente novamente depois de alguns dias de registros.
+                Nenhuma análise disponível. Adicione tarefas ou registros para obter recomendações.
               </p>
             ) : (
               insights.map((insight, idx) => (
                 <div key={idx} className="p-3 rounded-lg bg-muted/30 border border-primary/20 space-y-2">
-                  <h4 className="font-semibold text-sm text-primary">{insight.title}</h4>
-
-                  {insight.observation && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-0.5">📊 Observação:</p>
-                      <p className="text-sm">{insight.observation}</p>
-                    </div>
-                  )}
-
-                  {insight.suggestion && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-0.5">💡 Sugestão:</p>
-                      <p className="text-sm">{insight.suggestion}</p>
-                    </div>
-                  )}
-
-                  {insight.action && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-0.5">⚡ Quick Win:</p>
-                      <p className="text-sm">{insight.action}</p>
-                    </div>
-                  )}
+                  <h4 className="font-semibold text-sm text-primary flex items-center gap-2">
+                    {insight.title.includes('Priority') && '📊'}
+                    {insight.title.includes('Time-Blocking') && '⏰'}
+                    {insight.title.includes('Energy') && '⚡'}
+                    {insight.title}
+                  </h4>
+                  <p className="text-sm leading-relaxed text-foreground">{insight.content}</p>
                 </div>
               ))
             )}
@@ -112,7 +97,7 @@ export default function DiaryAIInsights() {
               ) : (
                 <>
                   <Sparkles className="w-3 h-3 mr-1.5" />
-                  Regenerar Insights
+                  Regenerar Análise
                 </>
               )}
             </Button>
