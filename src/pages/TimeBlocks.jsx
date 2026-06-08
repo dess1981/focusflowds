@@ -208,6 +208,8 @@ export default function TimeBlocks() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['timeblocks'] });
+      setForm(defaultForm);
+      setEditBlock(null);
       setShowForm(false);
     },
     onError: (err) => {
