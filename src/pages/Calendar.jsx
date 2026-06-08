@@ -1,15 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek,
-  addDays, addMonths, subMonths, isSameMonth, isSameDay, isToday, parseISO
+  addDays, addMonths, subMonths, isSameMonth, isToday
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog';
 import TaskListDrawer from '@/components/tasks/TaskListDrawer';
 
@@ -30,6 +29,11 @@ export default function Calendar() {
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks'],
     queryFn: () => base44.entities.Task.list('-created_date', 500),
+  });
+
+  const { data: timeBlocks = [] } = useQuery({
+    queryKey: ['timeblocks'],
+    queryFn: () => base44.entities.TimeBlock.list('-created_date', 500),
   });
 
   // Build calendar grid
@@ -57,10 +61,21 @@ export default function Calendar() {
     return map;
   }, [tasks]);
 
+  // Only scheduled (non-template) blocks with a date
+  const blocksByDate = useMemo(() => {
+    const map = {};
+    timeBlocks.filter(b => !b.is_template && b.date).forEach(b => {
+      if (!map[b.date]) map[b.date] = [];
+      map[b.date].push(b);
+    });
+    return map;
+  }, [timeBlocks]);
+
   const handleDayClick = (day) => {
     const key = format(day, 'yyyy-MM-dd');
     const dayTasks = tasksByDate[key] || [];
-    if (dayTasks.length > 0) {
+    const dayBlocks = blocksByDate[key] || [];
+    if (dayTasks.length > 0 || dayBlocks.length > 0) {
       setDrawerDate(day);
     } else {
       setSelectedDate(key);
@@ -69,6 +84,7 @@ export default function Calendar() {
   };
 
   const drawerTasks = drawerDate ? (tasksByDate[format(drawerDate, 'yyyy-MM-dd')] || []) : [];
+  const drawerBlocks = drawerDate ? (blocksByDate[format(drawerDate, 'yyyy-MM-dd')] || []) : [];
 
   const WEEK_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
@@ -115,9 +131,16 @@ export default function Calendar() {
           {calendarDays.map((day, idx) => {
             const key = format(day, 'yyyy-MM-dd');
             const dayTasks = tasksByDate[key] || [];
+            const dayBlocks = blocksByDate[key] || [];
             const isCurrentMonth = isSameMonth(day, currentMonth);
             const isCurrentDay = isToday(day);
+            const hasBlocks = dayBlocks.length > 0;
+            // max visible items = blocks + tasks combined
             const maxVisible = 3;
+            const visibleBlocks = dayBlocks.slice(0, maxVisible);
+            const remainingSlots = Math.max(0, maxVisible - visibleBlocks.length);
+            const visibleTasks = dayTasks.slice(0, remainingSlots);
+            const totalHidden = (dayBlocks.length - visibleBlocks.length) + (dayTasks.length - visibleTasks.length);
 
             return (
               <div
@@ -127,6 +150,7 @@ export default function Calendar() {
                   "min-h-[90px] p-1.5 border-b border-r border-border cursor-pointer transition-colors",
                   "hover:bg-muted/50",
                   !isCurrentMonth && "bg-muted/20",
+                  hasBlocks && "bg-amber-50/40 dark:bg-amber-900/10",
                   idx % 7 === 6 && "border-r-0",
                   Math.floor(idx / 7) === Math.floor((calendarDays.length - 1) / 7) && "border-b-0"
                 )}
@@ -141,9 +165,30 @@ export default function Calendar() {
                   {format(day, 'd')}
                 </div>
 
-                {/* Tasks */}
+                {/* Items */}
                 <div className="space-y-0.5">
-                  {dayTasks.slice(0, maxVisible).map(task => (
+                  {/* Time blocks first — shown as "protected" */}
+                  {visibleBlocks.map(block => (
+                    <div
+                      key={block.id}
+                      className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate font-medium"
+                      style={{
+                        backgroundColor: `${block.color || '#4F6BED'}20`,
+                        color: block.color || '#4F6BED',
+                        border: `1px solid ${block.color || '#4F6BED'}40`,
+                      }}
+                      title={`🔒 Bloco reservado: ${block.title}${block.start_time ? ` ${block.start_time}–${block.end_time}` : ''}`}
+                    >
+                      <Lock className="w-2.5 h-2.5 flex-shrink-0" />
+                      <span className="truncate">{block.title}</span>
+                      {block.start_time && (
+                        <span className="ml-auto text-[10px] opacity-70 flex-shrink-0">{block.start_time}</span>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Tasks */}
+                  {visibleTasks.map(task => (
                     <div
                       key={task.id}
                       className={cn(
@@ -157,9 +202,10 @@ export default function Calendar() {
                       <span className="truncate">{task.title}</span>
                     </div>
                   ))}
-                  {dayTasks.length > maxVisible && (
+
+                  {totalHidden > 0 && (
                     <div className="text-xs text-muted-foreground px-1">
-                      +{dayTasks.length - maxVisible} mais
+                      +{totalHidden} mais
                     </div>
                   )}
                 </div>
@@ -169,12 +215,13 @@ export default function Calendar() {
         </div>
       </div>
 
-      {/* Drawer: tasks for selected day */}
+      {/* Drawer: tasks + blocks for selected day */}
       <TaskListDrawer
         open={!!drawerDate}
         onOpenChange={(v) => !v && setDrawerDate(null)}
         title={drawerDate ? format(drawerDate, "d 'de' MMMM", { locale: ptBR }) : ''}
         tasks={drawerTasks}
+        timeBlocks={drawerBlocks}
       />
 
       {/* Form: new task on selected date */}
