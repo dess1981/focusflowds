@@ -1,0 +1,52 @@
+{
+  "name": "Medication",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nome do medicamento"
+    },
+    "dosage": {
+      "type": "string",
+      "description": "Dosagem (ex: 10mg)"
+    },
+    "frequency": {
+      "type": "string",
+      "enum": [
+        "uma vez",
+        "duas vezes",
+        "tr\u00eas vezes",
+        "conforme necess\u00e1rio"
+      ],
+      "description": "Frequ\u00eancia de uso"
+    },
+    "time_of_day": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Hor\u00e1rios de ingest\u00e3o (ex: 08:00, 20:00)"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de in\u00edcio"
+    },
+    "doctor": {
+      "type": "string",
+      "description": "M\u00e9dico prescrevente"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionais"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Medicamento est\u00e1 ativo"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

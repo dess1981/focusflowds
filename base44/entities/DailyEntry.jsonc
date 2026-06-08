@@ -1,0 +1,33 @@
+{
+  "name": "DailyEntry",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data da entrada"
+    },
+    "diary_text": {
+      "type": "string",
+      "description": "Texto do di\u00e1rio - como foi o dia"
+    },
+    "goals_text": {
+      "type": "string",
+      "description": "Objetivos e desejos do dia"
+    },
+    "mood": {
+      "type": "string",
+      "enum": [
+        "\ud83d\ude0d",
+        "\ud83d\ude0a",
+        "\ud83d\ude10",
+        "\ud83d\ude14",
+        "\ud83d\ude22"
+      ],
+      "description": "Humor do dia"
+    }
+  },
+  "required": [
+    "date"
+  ]
+}

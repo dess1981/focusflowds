@@ -1,0 +1,32 @@
+{
+  "name": "MedicationLog",
+  "type": "object",
+  "properties": {
+    "medication_id": {
+      "type": "string",
+      "description": "ID do medicamento"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data da ingest\u00e3o"
+    },
+    "time": {
+      "type": "string",
+      "description": "Hor\u00e1rio da ingest\u00e3o (HH:mm)"
+    },
+    "taken": {
+      "type": "boolean",
+      "default": false,
+      "description": "Tomou o medicamento"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas (efeitos colaterais, etc)"
+    }
+  },
+  "required": [
+    "medication_id",
+    "date"
+  ]
+}
