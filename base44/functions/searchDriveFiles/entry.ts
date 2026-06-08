@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
 
     const q = query.trim()
       ? `name contains '${query.replace(/'/g, "\\'")}' and trashed = false`
-      : `trashed = false`;
+      : `trashed = false and 'me' in owners`;
 
     const url = new URL('https://www.googleapis.com/drive/v3/files');
     url.searchParams.set('q', q);
