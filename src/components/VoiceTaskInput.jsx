@@ -151,7 +151,7 @@ Exemplo:
 
   return (
     <AnimatePresence>
-      <div className="fixed bottom-24 right-6 flex flex-col items-end gap-3 z-40">
+      <div className="fixed bottom-32 lg:bottom-8 right-6 lg:right-8 flex flex-col items-end gap-3 z-40">
         {/* Feedback de transcrição */}
         {transcript && (
           <motion.div
