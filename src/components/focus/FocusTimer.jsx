@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pause, Play, CheckCircle2, Zap, Brain, Target, Flame } from 'lucide-react';
+import { X, Pause, Play, CheckCircle2, Zap, Brain, Target, Flame, Settings } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
+import FocusModeSettings from './FocusModeSettings';
 
 const ADHD_MESSAGES = [
   "🧠 Seu cérebro está em modo turbo agora!",
@@ -30,6 +31,7 @@ export default function FocusTimer({ task, onClose, onComplete }) {
   const [paused, setPaused] = useState(false);
   const [msgIndex, setMsgIndex] = useState(0);
   const [completing, setCompleting] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const startedAt = useRef(new Date().toISOString());
   const intervalRef = useRef(null);
   const msgIntervalRef = useRef(null);
@@ -117,26 +119,36 @@ export default function FocusTimer({ task, onClose, onComplete }) {
     >
       {/* Top bar */}
       <div
-        className="flex items-center justify-between px-4 py-3"
-        style={{ borderBottom: '1px solid rgba(168,85,247,0.15)' }}
+       className="flex items-center justify-between px-4 py-3"
+       style={{ borderBottom: '1px solid rgba(168,85,247,0.15)' }}
       >
-        <div className="flex items-center gap-2">
-          <div
-            className="w-2.5 h-2.5 rounded-full animate-pulse"
-            style={{ background: paused ? '#f59e0b' : '#22c55e', boxShadow: `0 0 8px ${paused ? '#f59e0b' : '#22c55e'}` }}
-          />
-          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(168,85,247,0.8)' }}>
-            {paused ? 'PAUSADO' : 'EM FOCO'}
-          </span>
-        </div>
-        <button
-          onClick={onClose}
-          title="Minimizar (sessão continua)"
-          className="p-1 rounded-lg transition-colors hover:bg-white/10"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
-        >
-          <X className="w-4 h-4" />
-        </button>
+       <div className="flex items-center gap-2">
+         <div
+           className="w-2.5 h-2.5 rounded-full animate-pulse"
+           style={{ background: paused ? '#f59e0b' : '#22c55e', boxShadow: `0 0 8px ${paused ? '#f59e0b' : '#22c55e'}` }}
+         />
+         <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(168,85,247,0.8)' }}>
+           {paused ? 'PAUSADO' : 'EM FOCO'}
+         </span>
+       </div>
+       <div className="flex items-center gap-1">
+         <button
+           onClick={() => setSettingsOpen(true)}
+           title="Configurações de foco"
+           className="p-1 rounded-lg transition-colors hover:bg-white/10"
+           style={{ color: 'rgba(255,255,255,0.4)' }}
+         >
+           <Settings className="w-4 h-4" />
+         </button>
+         <button
+           onClick={onClose}
+           title="Minimizar (sessão continua)"
+           className="p-1 rounded-lg transition-colors hover:bg-white/10"
+           style={{ color: 'rgba(255,255,255,0.4)' }}
+         >
+           <X className="w-4 h-4" />
+         </button>
+       </div>
       </div>
 
       {/* Content */}
@@ -239,6 +251,8 @@ export default function FocusTimer({ task, onClose, onComplete }) {
           </button>
         </div>
       </div>
+
+      <FocusModeSettings open={settingsOpen} onOpenChange={setSettingsOpen} />
     </motion.div>
   );
 }

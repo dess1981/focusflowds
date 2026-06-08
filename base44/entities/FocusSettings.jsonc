@@ -1,0 +1,54 @@
+{
+  "name": "FocusSettings",
+  "type": "object",
+  "properties": {
+    "emergency_contacts": {
+      "type": "array",
+      "description": "Contatos de emerg\u00eancia para notifica\u00e7\u00e3o durante foco",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "description": "N\u00famero com c\u00f3digo de pa\u00eds (ex: +5511999999999)"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "whatsapp",
+              "sms"
+            ],
+            "default": "whatsapp"
+          }
+        }
+      }
+    },
+    "auto_response_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Ativar resposta autom\u00e1tica durante foco"
+    },
+    "auto_response_message": {
+      "type": "string",
+      "default": "Estou em uma sess\u00e3o de foco agora. Voltarei em breve!",
+      "description": "Mensagem padr\u00e3o de resposta autom\u00e1tica"
+    },
+    "notify_emergency_contacts": {
+      "type": "boolean",
+      "default": false,
+      "description": "Notificar contatos de emerg\u00eancia ao iniciar foco"
+    },
+    "focus_end_notification": {
+      "type": "boolean",
+      "default": true,
+      "description": "Notificar contatos quando foco termina"
+    }
+  },
+  "required": []
+}
