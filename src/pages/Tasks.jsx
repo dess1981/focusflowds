@@ -9,7 +9,7 @@ import TaskCard from '@/components/tasks/TaskCard';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import KanbanBoard from '@/components/tasks/KanbanBoard';
 import CategoryTimeStats from '@/components/tasks/CategoryTimeStats';
-import VoiceTaskInput from '@/components/VoiceTaskInput';
+
 import { AnimatePresence, motion } from 'framer-motion';
 import FocusStatsPanel from '@/components/focus/FocusStatsPanel';
 
@@ -247,9 +247,6 @@ export default function Tasks() {
         task={editTask}
         onSave={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}
       />
-
-      {/* Voice Task Input */}
-      <VoiceTaskInput onTaskCreated={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })} />
     </div>
   );
 }
