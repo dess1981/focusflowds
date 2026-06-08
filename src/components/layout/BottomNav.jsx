@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { CalendarDays, ListTodo, LayoutDashboard, Sparkles, MoreHorizontal } from 'lucide-react';
+import { CalendarDays, ListTodo, LayoutDashboard, Sparkles, LayoutTemplate } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const mainItems = [
   { path: '/', icon: CalendarDays, label: 'Planner' },
   { path: '/tasks', icon: ListTodo, label: 'Tarefas' },
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { path: '/templates', icon: LayoutTemplate, label: 'Templates' },
   { path: '/assistant', icon: Sparkles, label: 'IA' },
-  { path: '/calendar', icon: MoreHorizontal, label: 'Mais' },
 ];
 
 export default function BottomNav() {

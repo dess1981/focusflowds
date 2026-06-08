@@ -14,6 +14,7 @@ import SubtasksEditor from './SubtasksEditor';
 import InPersonEventSection from './InPersonEventSection';
 import MeetInviteSection from './MeetInviteSection';
 import DriveFilesSection from './DriveFilesSection';
+import UseTemplateButton from './UseTemplateButton';
 
 const WEEK_DAYS = [
   { label: 'Dom', value: 0 },
@@ -120,7 +121,14 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
+          <div className="flex items-center justify-between gap-3">
           <DialogTitle>{isEdit ? 'Editar Tarefa' : 'Nova Tarefa'}</DialogTitle>
+          {!isEdit && (
+            <UseTemplateButton
+              onApply={(fields) => setForm(f => ({ ...f, ...fields }))}
+            />
+          )}
+        </div>
         </DialogHeader>
 
         <div className="space-y-4 py-2">

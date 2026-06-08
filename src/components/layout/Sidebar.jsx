@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, CalendarDays, ListTodo, FolderKanban, 
   Clock, Settings, ChevronLeft, ChevronRight, Plus, 
-  Sparkles, Tag, X, Calendar
+  Sparkles, Tag, X, Calendar, LayoutTemplate
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -15,6 +15,7 @@ const navItems = [
   { path: '/projects', icon: FolderKanban, label: 'Projetos' },
   { path: '/time-blocks', icon: Clock, label: 'Blocos de Tempo' },
   { path: '/categories', icon: Tag, label: 'Categorias' },
+  { path: '/templates', icon: LayoutTemplate, label: 'Templates' },
   { path: '/assistant', icon: Sparkles, label: 'Assistente IA' },
 ];
 
