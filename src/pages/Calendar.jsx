@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  format, startOfMonth, endOfMonth, startOfWeek, endOfWeek,
+  format, startOfWeek, endOfWeek,
   addDays, addMonths, subMonths, isSameMonth, isToday
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -11,6 +11,8 @@ import { ChevronLeft, ChevronRight, Plus, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog';
 import TaskListDrawer from '@/components/tasks/TaskListDrawer';
+import { useGoogleCalendarEvents, GoogleCalendarConnectButton } from '@/components/calendar/GoogleCalendarEvents';
+import { startOfMonth, endOfMonth } from 'date-fns';
 
 const priorityColors = {
   urgent: 'bg-red-500',
@@ -35,6 +37,11 @@ export default function Calendar() {
     queryKey: ['timeblocks'],
     queryFn: () => base44.entities.TimeBlock.list('-created_date', 500),
   });
+
+  // Google Calendar events for current month range
+  const monthStart = format(startOfMonth(currentMonth), "yyyy-MM-dd'T'00:00:00'Z'");
+  const monthEnd = format(endOfMonth(currentMonth), "yyyy-MM-dd'T'23:59:59'Z'");
+  const { eventsByDate, connected: gcConnected, loading: gcLoading, connect: gcConnect, disconnect: gcDisconnect } = useGoogleCalendarEvents(monthStart, monthEnd);
 
   // Build calendar grid
   const calendarDays = useMemo(() => {
@@ -108,6 +115,12 @@ export default function Calendar() {
           <Button variant="outline" size="icon" onClick={() => setCurrentMonth(m => addMonths(m, 1))}>
             <ChevronRight className="w-4 h-4" />
           </Button>
+          <GoogleCalendarConnectButton
+            connected={gcConnected}
+            loading={gcLoading}
+            onConnect={gcConnect}
+            onDisconnect={gcDisconnect}
+          />
           <Button className="ml-2" onClick={() => { setSelectedDate(format(new Date(), 'yyyy-MM-dd')); setShowForm(true); }}>
             <Plus className="w-4 h-4 mr-1.5" />
             Nova Tarefa
@@ -132,15 +145,18 @@ export default function Calendar() {
             const key = format(day, 'yyyy-MM-dd');
             const dayTasks = tasksByDate[key] || [];
             const dayBlocks = blocksByDate[key] || [];
+            const dayGcEvents = eventsByDate[key] || [];
             const isCurrentMonth = isSameMonth(day, currentMonth);
             const isCurrentDay = isToday(day);
             const hasBlocks = dayBlocks.length > 0;
-            // max visible items = blocks + tasks combined
+            // max visible items = gc events + blocks + tasks combined
             const maxVisible = 3;
-            const visibleBlocks = dayBlocks.slice(0, maxVisible);
-            const remainingSlots = Math.max(0, maxVisible - visibleBlocks.length);
+            const visibleGcEvents = dayGcEvents.slice(0, maxVisible);
+            const remainingAfterGc = Math.max(0, maxVisible - visibleGcEvents.length);
+            const visibleBlocks = dayBlocks.slice(0, remainingAfterGc);
+            const remainingSlots = Math.max(0, remainingAfterGc - visibleBlocks.length);
             const visibleTasks = dayTasks.slice(0, remainingSlots);
-            const totalHidden = (dayBlocks.length - visibleBlocks.length) + (dayTasks.length - visibleTasks.length);
+            const totalHidden = (dayGcEvents.length - visibleGcEvents.length) + (dayBlocks.length - visibleBlocks.length) + (dayTasks.length - visibleTasks.length);
 
             return (
               <div
@@ -167,7 +183,31 @@ export default function Calendar() {
 
                 {/* Items */}
                 <div className="space-y-0.5">
-                  {/* Time blocks first — shown as "protected" */}
+                  {/* Google Calendar events — shown first */}
+                  {visibleGcEvents.map(ev => {
+                    const startTime = ev.start?.dateTime
+                      ? format(new Date(ev.start.dateTime), 'HH:mm')
+                      : null;
+                    return (
+                      <div
+                        key={ev.id}
+                        className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate font-medium"
+                        style={{
+                          backgroundColor: '#EA433520',
+                          color: '#EA4335',
+                          border: '1px solid #EA433540',
+                        }}
+                        title={`📅 ${ev.summary}${startTime ? ` ${startTime}` : ''}`}
+                      >
+                        <span className="truncate">{ev.summary || '(sem título)'}</span>
+                        {startTime && (
+                          <span className="ml-auto text-[10px] opacity-70 flex-shrink-0">{startTime}</span>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {/* Time blocks — shown as "protected" */}
                   {visibleBlocks.map(block => (
                     <div
                       key={block.id}
