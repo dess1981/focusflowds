@@ -199,7 +199,7 @@ export default function GlobalSearch() {
 
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/30 hover:bg-primary/20 transition-colors text-sm text-muted-foreground md:bottom-auto md:top-[100px] md:right-4 z-40"
+        className="fixed bottom-6 right-6 flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/30 hover:bg-primary/20 transition-colors text-sm text-muted-foreground md:bottom-auto md:top-4 md:left-1/2 md:right-auto md:-translate-x-1/2 z-40"
       >
         <Search className="w-4 h-4" />
         <span className="hidden sm:inline">Buscar</span>
