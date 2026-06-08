@@ -135,6 +135,25 @@
     "calendar_event_id": {
       "type": "string",
       "description": "ID do evento no Google Calendar"
+    },
+    "checklist": {
+      "type": "array",
+      "description": "Lista de itens de checklist",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "done": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
     }
   },
   "required": [

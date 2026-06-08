@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Clock, Calendar, ChevronRight, Video } from 'lucide-react';
+import { Clock, Calendar, ChevronRight, Video, CheckSquare, GitBranch } from 'lucide-react';
 import PriorityBadge from './PriorityBadge';
 import StatusBadge from './StatusBadge';
 import { format } from 'date-fns';
@@ -87,6 +87,25 @@ export default function TaskCard({ task, onStatusChange, onClick, compact = fals
             </span>
           )}
         </div>
+
+        {/* Checklist progress */}
+        {task.checklist?.length > 0 && (
+          <div className="flex items-center gap-1.5 mt-1.5">
+            <CheckSquare className="w-3 h-3 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">
+              {task.checklist.filter(i => i.done).length}/{task.checklist.length}
+            </span>
+            <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${(task.checklist.filter(i => i.done).length / task.checklist.length) * 100}%`,
+                  background: 'linear-gradient(90deg, #a855f7, #22d3ee)'
+                }}
+              />
+            </div>
+          </div>
+        )}
 
         {task.task_type === 'meeting' && task.meet_link && (
           <a

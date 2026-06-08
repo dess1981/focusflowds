@@ -8,7 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
-import { RefreshCw, Clock, Video, ExternalLink, Copy } from 'lucide-react';
+import { RefreshCw, Clock, Video, ExternalLink, Copy, CheckSquare, GitBranch } from 'lucide-react';
+import ChecklistEditor from './ChecklistEditor';
+import SubtasksEditor from './SubtasksEditor';
 
 const WEEK_DAYS = [
   { label: 'Dom', value: 0 },
@@ -26,7 +28,7 @@ const defaultTask = {
   due_date: '', time_block_start: '', time_block_end: '',
   estimated_minutes: '', energy_level: 'medium', category_id: '',
   project_id: '', recurrence: 'none', recurrence_days: [], recurrence_end_date: '', parent_task_id: '',
-  activity_block_id: '',
+  activity_block_id: '', checklist: [],
 };
 
 function generateMeetLink() {
@@ -369,6 +371,34 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
             )}
           </div>
         </div>
+
+          {/* Checklist */}
+          <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/30">
+            <div className="flex items-center gap-2">
+              <CheckSquare className="w-4 h-4 text-muted-foreground" />
+              <Label className="text-sm font-semibold">Checklist</Label>
+            </div>
+            <ChecklistEditor
+              items={form.checklist || []}
+              onChange={items => set('checklist', items)}
+            />
+          </div>
+
+          {/* Subtarefas — só para tarefas já salvas */}
+          {isEdit && (
+            <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/30">
+              <div className="flex items-center gap-2">
+                <GitBranch className="w-4 h-4 text-muted-foreground" />
+                <Label className="text-sm font-semibold">Subtarefas</Label>
+              </div>
+              <SubtasksEditor parentTaskId={task.id} />
+            </div>
+          )}
+          {!isEdit && (
+            <p className="text-xs text-muted-foreground px-1">
+              💡 Salve a tarefa primeiro para adicionar subtarefas.
+            </p>
+          )}
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
