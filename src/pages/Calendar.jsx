@@ -23,10 +23,10 @@ const priorityColors = {
 };
 
 const taskColorStyles = {
-  urgent: { bgColor: '#f43f5e', bgLight: 'rgba(244, 63, 94, 0.15)', border: 'rgba(244, 63, 94, 0.4)' },
-  high: { bgColor: '#f59e0b', bgLight: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.4)' },
-  medium: { bgColor: '#06b6d4', bgLight: 'rgba(6, 182, 212, 0.15)', border: 'rgba(6, 182, 212, 0.4)' },
-  low: { bgColor: '#64748b', bgLight: 'rgba(100, 116, 139, 0.15)', border: 'rgba(100, 116, 139, 0.4)' },
+  urgent: { bgColor: '#e11d48', bgLight: 'rgba(225, 29, 72, 0.1)', border: 'rgba(225, 29, 72, 0.25)' },
+  high: { bgColor: '#f97316', bgLight: 'rgba(249, 115, 22, 0.1)', border: 'rgba(249, 115, 22, 0.25)' },
+  medium: { bgColor: '#0891b2', bgLight: 'rgba(8, 145, 178, 0.1)', border: 'rgba(8, 145, 178, 0.25)' },
+  low: { bgColor: '#78716c', bgLight: 'rgba(120, 113, 108, 0.1)', border: 'rgba(120, 113, 108, 0.25)' },
 };
 
 export default function Calendar() {
@@ -197,10 +197,10 @@ export default function Calendar() {
                 onClick={() => handleDayClick(day)}
                 className={cn(
                   "min-h-[64px] sm:min-h-[90px] p-1 sm:p-1.5 border-b border-r border-border cursor-pointer transition-all",
-                  "hover:bg-white/10 active:bg-white/15",
-                  snapshot.isDraggingOver && "bg-primary/20 border-primary/50",
-                  !isCurrentMonth && "bg-black/10",
-                  hasBlocks && "bg-amber-300/10",
+                  "hover:bg-white/8 active:bg-white/12",
+                  snapshot.isDraggingOver && "bg-primary/15 border-primary/40",
+                  !isCurrentMonth && "bg-black/8",
+                  hasBlocks && "bg-amber-300/8",
                   idx % 7 === 6 && "border-r-0",
                   Math.floor(idx / 7) === Math.floor((calendarDays.length - 1) / 7) && "border-b-0"
                 )}
@@ -245,19 +245,19 @@ export default function Calendar() {
                       : null;
                     return (
                       <div
-                        key={ev.id}
-                        className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs truncate font-medium backdrop-blur-sm transition-all hover:shadow-md"
-                        style={{ 
-                          backgroundColor: 'rgba(244, 63, 94, 0.12)',
-                          color: '#f43f5e',
-                          border: '1px solid rgba(244, 63, 94, 0.35)',
-                          boxShadow: '0 4px 12px rgba(244, 63, 94, 0.08)'
-                        }}
-                        title={`📅 ${ev.summary}${startTime ? ` ${startTime}` : ''}`}
-                      >
-                        <span className="truncate">{ev.summary || '(sem título)'}</span>
-                        {startTime && <span className="ml-auto text-[10px] opacity-70 flex-shrink-0">{startTime}</span>}
-                      </div>
+                         key={ev.id}
+                         className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs truncate font-medium backdrop-blur-md transition-all hover:shadow-lg hover:scale-105"
+                         style={{ 
+                           backgroundColor: 'rgba(225, 29, 72, 0.08)',
+                           color: '#be123c',
+                           border: '1px solid rgba(225, 29, 72, 0.2)',
+                           boxShadow: '0 4px 12px rgba(225, 29, 72, 0.06)'
+                         }}
+                         title={`📅 ${ev.summary}${startTime ? ` ${startTime}` : ''}`}
+                       >
+                         <span className="truncate">{ev.summary || '(sem título)'}</span>
+                         {startTime && <span className="ml-auto text-[10px] opacity-60 flex-shrink-0">{startTime}</span>}
+                       </div>
                     );
                   })}
 
@@ -265,19 +265,19 @@ export default function Calendar() {
                     const blockColor = block.color || '#4F6BED';
                     return (
                       <div
-                        key={block.id}
-                        className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs truncate font-medium backdrop-blur-sm transition-all hover:shadow-md"
-                        style={{
-                          backgroundColor: `${blockColor}15`,
-                          color: blockColor,
-                          border: `1px solid ${blockColor}45`,
-                          boxShadow: `0 4px 12px ${blockColor}12`
-                        }}
-                        title={`🔒 ${block.title}`}
-                      >
-                        <Lock className="w-2.5 h-2.5 flex-shrink-0" />
-                        <span className="truncate">{block.title}</span>
-                      </div>
+                         key={block.id}
+                         className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs truncate font-medium backdrop-blur-md transition-all hover:shadow-lg hover:scale-105"
+                         style={{
+                           backgroundColor: `${blockColor}0D`,
+                           color: blockColor,
+                           border: `1px solid ${blockColor}28`,
+                           boxShadow: `0 4px 12px ${blockColor}08`
+                         }}
+                         title={`🔒 ${block.title}`}
+                       >
+                         <Lock className="w-2.5 h-2.5 flex-shrink-0" />
+                         <span className="truncate">{block.title}</span>
+                       </div>
                     );
                   })}
 
@@ -291,15 +291,15 @@ export default function Calendar() {
                             {...dragProvided.draggableProps}
                             {...dragProvided.dragHandleProps}
                             className={cn(
-                              "flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs truncate font-medium transition-all backdrop-blur-sm",
-                              dragSnapshot.isDragging && "opacity-50 scale-95",
-                              task.status === 'done' ? "bg-muted/40 text-muted-foreground line-through" : "cursor-move hover:shadow-md"
+                              "flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs truncate font-medium transition-all backdrop-blur-md",
+                              dragSnapshot.isDragging && "opacity-60 scale-98",
+                              task.status === 'done' ? "bg-muted/30 text-muted-foreground line-through" : "cursor-move hover:shadow-lg hover:scale-105"
                             )}
                             style={task.status === 'done' ? {} : {
                               backgroundColor: taskStyle.bgLight,
                               color: taskStyle.bgColor,
                               border: `1px solid ${taskStyle.border}`,
-                              boxShadow: `0 4px 12px ${taskStyle.bgColor}10`
+                              boxShadow: `0 4px 12px ${taskStyle.bgColor}08`
                             }}
                           >
                             <div className={cn("w-2 h-2 rounded-full flex-shrink-0", priorityColors[task.priority] || 'bg-slate-500')} style={task.status === 'done' ? {} : { backgroundColor: taskStyle.bgColor }} />
