@@ -277,7 +277,7 @@ export default function TimeBlocks() {
         <div>
           <h1 className="text-2xl font-heading font-bold tracking-tight">Blocos de Tempo</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            📅 Organize seu dia com blocos de atividade
+            Organize seu dia com blocos de atividade
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
