@@ -54,7 +54,7 @@ const navSections = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isMobileSheet = false }) {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -63,8 +63,9 @@ export default function Sidebar() {
       {/* Sidebar — desktop only */}
       <aside
         className={cn(
-          "hidden lg:flex fixed top-0 left-0 h-full z-50 flex-col transition-all duration-300",
-          collapsed ? "w-[72px]" : "w-[260px]"
+          "flex flex-col transition-all duration-300",
+          isMobileSheet ? "w-full h-full" : "hidden lg:flex fixed top-0 left-0 h-full z-50",
+          !isMobileSheet && (collapsed ? "w-[72px]" : "w-[260px]")
         )}
         style={{
           background: 'rgba(10, 12, 22, 0.9)',
@@ -76,11 +77,11 @@ export default function Sidebar() {
         {/* Header */}
         <div className={cn(
           "flex items-center h-16 px-4 transition-all",
-          collapsed ? "justify-center" : "justify-between"
+          (collapsed || isMobileSheet) ? "justify-center" : "justify-between"
         )}
           style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
         >
-          {!collapsed && (
+          {!(collapsed || isMobileSheet) && (
             <div className="flex items-center gap-2.5">
               <div
                 className="w-8 h-8 rounded-xl flex items-center justify-center"
@@ -99,25 +100,28 @@ export default function Sidebar() {
               </span>
             </div>
           )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-lg transition-colors"
-            style={{ color: 'rgba(255,255,255,0.4)' }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-          >
-            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
+          {!isMobileSheet && (
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-1.5 rounded-lg transition-colors"
+              style={{ color: 'rgba(255,255,255,0.4)' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            </button>
+          )}
         </div>
 
         {/* Quick Add */}
-        <div className="p-3">
-          <Link to="/tasks?new=true">
-            <button
-              className={cn(
-                "w-full flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white transition-all duration-200",
-                collapsed && "justify-center px-0"
-              )}
+        {!isMobileSheet && (
+          <div className="p-3">
+            <Link to="/tasks?new=true">
+              <button
+                className={cn(
+                  "w-full flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white transition-all duration-200",
+                  collapsed && "justify-center px-0"
+                )}
               style={{
                 background: 'linear-gradient(135deg, #a855f7, #3b82f6)',
                 boxShadow: '0 4px 20px rgba(168, 85, 247, 0.35)',
@@ -125,9 +129,10 @@ export default function Sidebar() {
             >
               <Plus className="w-4 h-4 flex-shrink-0" />
               {!collapsed && <span>Nova Tarefa</span>}
-            </button>
-          </Link>
-        </div>
+              </button>
+              </Link>
+              </div>
+              )}
 
         {/* Navigation */}
         <nav className="flex-1 px-2 py-3 space-y-4 overflow-y-auto">

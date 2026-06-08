@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import MobileMenuButton from './MobileMenuButton';
 import BottomNav from './BottomNav';
 import MedicationReminders from '@/components/health/MedicationReminders';
 import GlobalSearch from '@/components/GlobalSearch';
@@ -18,6 +19,7 @@ export default function AppLayout() {
   return (
     <div className="min-h-screen">
       <Sidebar />
+      <MobileMenuButton />
       <main className="lg:pl-[260px] transition-all duration-300">
         <div className="max-w-[1600px] mx-auto">
           <OverloadWarning />
