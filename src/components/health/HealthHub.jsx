@@ -35,7 +35,7 @@ export default function HealthHub() {
 
   const tabs = [
     { value: 'diary', label: 'Emocional', icon: BookOpen },
-    { value: 'today', label: 'Medicação Hoje', icon: Pill },
+    { value: 'today', label: 'Atividades Diárias', icon: Pill },
     { value: 'manage', label: 'Meus Medicamentos', icon: Pill },
     { value: 'appointments', label: 'Consultas', icon: Calendar },
     { value: 'tests', label: 'Exames', icon: Microscope },
