@@ -13,6 +13,7 @@ import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import TaskListDrawer from '@/components/tasks/TaskListDrawer';
 import { useGoogleCalendarEvents, GoogleCalendarConnectButton } from '@/components/calendar/GoogleCalendarEvents';
 import { startOfMonth, endOfMonth } from 'date-fns';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
 const priorityColors = {
   urgent: 'bg-red-500',
@@ -90,6 +91,20 @@ export default function Calendar() {
     }
   };
 
+  const handleDragEnd = async (result) => {
+    const { source, destination, draggableId } = result;
+    if (!destination) return;
+
+    const taskId = draggableId.replace('task-', '');
+    const newDate = destination.droppableId;
+    const task = tasks.find(t => t.id === taskId);
+
+    if (task && source.droppableId !== destination.droppableId) {
+      await base44.entities.Task.update(taskId, { due_date: newDate });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    }
+  };
+
   const drawerTasks = drawerDate ? (tasksByDate[format(drawerDate, 'yyyy-MM-dd')] || []) : [];
   const drawerBlocks = drawerDate ? (blocksByDate[format(drawerDate, 'yyyy-MM-dd')] || []) : [];
 
@@ -145,8 +160,9 @@ export default function Calendar() {
         </div>
 
         {/* Days grid */}
-        <div className="grid grid-cols-7">
-          {calendarDays.map((day, idx) => {
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="grid grid-cols-7">
+            {calendarDays.map((day, idx) => {
             const key = format(day, 'yyyy-MM-dd');
             const dayTasks = tasksByDate[key] || [];
             const dayBlocks = blocksByDate[key] || [];
@@ -166,12 +182,16 @@ export default function Calendar() {
             const totalHidden = (dayGcEvents.length - visibleGcEvents.length) + (dayBlocks.length - visibleBlocks.length) + (dayTasks.length - visibleTasks.length);
 
             return (
+              <Droppable droppableId={key} key={key}>
+                {(provided, snapshot) => (
               <div
-                key={key}
+                ref={provided.innerRef}
+                {...provided.droppableProps}
                 onClick={() => handleDayClick(day)}
                 className={cn(
-                  "min-h-[64px] sm:min-h-[90px] p-1 sm:p-1.5 border-b border-r border-border cursor-pointer transition-colors",
+                  "min-h-[64px] sm:min-h-[90px] p-1 sm:p-1.5 border-b border-r border-border cursor-pointer transition-all",
                   "hover:bg-white/10 active:bg-white/15",
+                  snapshot.isDraggingOver && "bg-primary/20 border-primary/50",
                   !isCurrentMonth && "bg-black/10",
                   hasBlocks && "bg-amber-300/10",
                   idx % 7 === 6 && "border-r-0",
@@ -219,7 +239,7 @@ export default function Calendar() {
                     return (
                       <div
                         key={ev.id}
-                        className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate font-medium"
+                        className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate font-medium opacity-60"
                         style={{ backgroundColor: '#EA433520', color: '#EA4335', border: '1px solid #EA433540' }}
                         title={`📅 ${ev.summary}${startTime ? ` ${startTime}` : ''}`}
                       >
@@ -232,7 +252,7 @@ export default function Calendar() {
                   {visibleBlocks.map(block => (
                     <div
                       key={block.id}
-                      className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate font-medium"
+                      className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate font-medium opacity-60"
                       style={{ backgroundColor: `${block.color || '#4F6BED'}20`, color: block.color || '#4F6BED', border: `1px solid ${block.color || '#4F6BED'}40` }}
                       title={`🔒 ${block.title}`}
                     >
@@ -241,27 +261,38 @@ export default function Calendar() {
                     </div>
                   ))}
 
-                  {visibleTasks.map(task => (
+                  {visibleTasks.map((task, taskIdx) => (
+                    <Draggable key={task.id} draggableId={`task-${task.id}`} index={taskIdx}>
+                      {(dragProvided, dragSnapshot) => (
                     <div
-                      key={task.id}
+                      ref={dragProvided.innerRef}
+                      {...dragProvided.draggableProps}
+                      {...dragProvided.dragHandleProps}
                       className={cn(
-                        "flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate",
-                        task.status === 'done' ? "bg-muted text-muted-foreground line-through" : "bg-primary/10 text-primary font-medium"
+                        "flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate transition-all",
+                        dragSnapshot.isDragging && "opacity-50 scale-95",
+                        task.status === 'done' ? "bg-muted text-muted-foreground line-through" : "bg-primary/10 text-primary font-medium cursor-move hover:bg-primary/20"
                       )}
                     >
                       <div className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", priorityColors[task.priority] || 'bg-slate-400')} />
                       <span className="truncate">{task.title}</span>
                     </div>
+                      )}
+                    </Draggable>
                   ))}
 
                   {totalHidden > 0 && (
                     <div className="text-xs text-muted-foreground px-1">+{totalHidden} mais</div>
                   )}
                 </div>
+                {provided.placeholder}
               </div>
+                )}
+              </Droppable>
             );
           })}
-        </div>
+          </div>
+        </DragDropContext>
       </div>
 
       {/* Drawer: tasks + blocks for selected day */}
