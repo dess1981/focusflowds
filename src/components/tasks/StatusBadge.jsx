@@ -15,7 +15,11 @@ export default function StatusBadge({ status, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={cn("transition-transform hover:scale-110", config.classes)}
+      title={`Status: ${config.label} — clique para avançar`}
+      className={cn(
+        "transition-all hover:scale-125 active:scale-95 rounded-full p-0.5 hover:bg-white/10 cursor-pointer",
+        config.classes
+      )}
     >
       <Icon className="w-5 h-5" />
     </button>

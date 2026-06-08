@@ -130,7 +130,8 @@ export default function FocusTimer({ task, onClose, onComplete }) {
           </span>
         </div>
         <button
-          onClick={handleStop}
+          onClick={onClose}
+          title="Minimizar (sessão continua)"
           className="p-1 rounded-lg transition-colors hover:bg-white/10"
           style={{ color: 'rgba(255,255,255,0.4)' }}
         >
@@ -201,7 +202,7 @@ export default function FocusTimer({ task, onClose, onComplete }) {
         <div className="flex gap-2 w-full">
           <button
             onClick={() => setPaused(p => !p)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all"
+            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-sm font-medium transition-all"
             style={{
               background: 'rgba(255,255,255,0.07)',
               border: '1px solid rgba(255,255,255,0.1)',
@@ -210,6 +211,18 @@ export default function FocusTimer({ task, onClose, onComplete }) {
           >
             {paused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
             {paused ? 'Continuar' : 'Pausar'}
+          </button>
+          <button
+            onClick={handleStop}
+            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-sm font-medium transition-all"
+            style={{
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,100,100,0.25)',
+              color: 'rgba(255,120,120,0.8)',
+            }}
+          >
+            <X className="w-4 h-4" />
+            Parar
           </button>
           <button
             onClick={handleComplete}
