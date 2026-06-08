@@ -14,6 +14,7 @@ import SubtasksEditor from './SubtasksEditor';
 import InPersonEventSection from './InPersonEventSection';
 import MeetInviteSection from './MeetInviteSection';
 import DriveFilesSection from './DriveFilesSection';
+import DriveFileSelector from './DriveFileSelector';
 import UseTemplateButton from './UseTemplateButton';
 
 const WEEK_DAYS = [
@@ -433,9 +434,9 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
               <HardDrive className="w-4 h-4 text-muted-foreground" />
               <Label className="text-sm font-semibold">Documentos do Google Drive</Label>
             </div>
-            <DriveFilesSection
-              links={form.drive_file_urls || []}
-              onChange={items => set('drive_file_urls', items)}
+            <DriveFileSelector
+              selectedFiles={form.drive_file_urls || []}
+              onSelect={items => set('drive_file_urls', items)}
             />
           </div>
 
