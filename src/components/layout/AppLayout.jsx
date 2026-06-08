@@ -5,6 +5,7 @@ import BottomNav from './BottomNav';
 import MedicationReminders from '@/components/health/MedicationReminders';
 import GlobalSearch from '@/components/GlobalSearch';
 import FocusModeModal from '@/components/focus/FocusModeModal';
+import OverloadWarning from '@/components/alerts/OverloadWarning';
 import { useSmartNotifications } from '@/hooks/useSmartNotifications';
 import { useFocusMode } from '@/context/FocusModeContext';
 
@@ -16,8 +17,11 @@ export default function AppLayout() {
     <div className="min-h-screen">
       <Sidebar />
       <main className="lg:pl-[260px] transition-all duration-300">
-        <div className="p-4 pt-16 pb-24 lg:pt-6 lg:pb-6 lg:p-6 max-w-[1600px] mx-auto">
-          <Outlet />
+        <div className="max-w-[1600px] mx-auto">
+          <OverloadWarning />
+          <div className="p-4 pt-16 pb-24 lg:pt-6 lg:pb-6 lg:p-6">
+            <Outlet />
+          </div>
         </div>
       </main>
       <BottomNav />
