@@ -36,6 +36,33 @@
         "personal"
       ],
       "default": "task"
+    },
+    "recurrence": {
+      "type": "string",
+      "enum": [
+        "none",
+        "daily",
+        "weekly",
+        "monthly"
+      ],
+      "default": "none",
+      "description": "Tipo de recorr\u00eancia"
+    },
+    "recurrence_end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de fim da recorr\u00eancia"
+    },
+    "recurrence_days": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Dias da semana para recorr\u00eancia semanal (0=Dom, 1=Seg, ...)"
+    },
+    "recurrence_group_id": {
+      "type": "string",
+      "description": "ID do grupo de recorr\u00eancia (para editar/excluir todos)"
     }
   },
   "required": [
