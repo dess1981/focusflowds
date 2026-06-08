@@ -39,5 +39,13 @@ export function FocusTimerProvider({ children }) {
 }
 
 export function useFocusTimer() {
-  return useContext(FocusTimerContext);
+  const context = useContext(FocusTimerContext);
+  if (!context) {
+    return {
+      activeTask: null,
+      startFocus: () => {},
+      stopFocus: () => {},
+    };
+  }
+  return context;
 }
