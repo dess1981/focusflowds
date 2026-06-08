@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, addDays, subDays, isToday, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Plus, CalendarDays, Sun, Sunrise, Moon, Sparkles } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ChevronLeft, ChevronRight, Plus, CalendarDays, Sun, Sunrise, Moon, Sparkles, Search, X } from 'lucide-react';
 import TaskCard from '@/components/tasks/TaskCard';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog';
 import { cn } from '@/lib/utils';
@@ -34,6 +35,7 @@ export default function DailyPlanner() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showForm, setShowForm] = useState(false);
   const [editTask, setEditTask] = useState(null);
+  const [search, setSearch] = useState('');
   const queryClient = useQueryClient();
   const dateStr = format(selectedDate, 'yyyy-MM-dd');
 
@@ -42,19 +44,39 @@ export default function DailyPlanner() {
     queryFn: () => base44.entities.Task.list('-created_date', 200),
   });
 
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => base44.entities.Category.list(),
+  });
+
+  const categoryMap = useMemo(() => {
+    const map = {};
+    categories.forEach(c => { map[c.id] = c.name; });
+    return map;
+  }, [categories]);
+
   const todayTasks = useMemo(() => 
     allTasks.filter(t => t.due_date === dateStr),
     [allTasks, dateStr]
   );
 
+  const filteredTodayTasks = useMemo(() => {
+    if (!search.trim()) return todayTasks;
+    const q = search.toLowerCase();
+    return todayTasks.filter(t =>
+      t.title?.toLowerCase().includes(q) ||
+      (t.category_id && categoryMap[t.category_id]?.toLowerCase().includes(q))
+    );
+  }, [todayTasks, search, categoryMap]);
+
   const scheduledTasks = useMemo(() => 
-    todayTasks.filter(t => t.time_block_start),
-    [todayTasks]
+    filteredTodayTasks.filter(t => t.time_block_start),
+    [filteredTodayTasks]
   );
 
   const unscheduledTasks = useMemo(() => 
-    todayTasks.filter(t => !t.time_block_start),
-    [todayTasks]
+    filteredTodayTasks.filter(t => !t.time_block_start),
+    [filteredTodayTasks]
   );
 
   const updateStatus = useMutation({
@@ -129,6 +151,30 @@ export default function DailyPlanner() {
             <span className="hidden sm:inline">Nova Tarefa</span>
           </button>
         </div>
+      </div>
+
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'rgba(255,255,255,0.35)' }} />
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar por nome ou categoria..."
+          className="w-full h-10 pl-9 pr-9 rounded-xl text-sm outline-none text-white placeholder:text-white/30 transition-all"
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: search ? '1px solid rgba(168,85,247,0.45)' : '1px solid rgba(255,255,255,0.1)',
+          }}
+        />
+        {search && (
+          <button
+            onClick={() => setSearch('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-opacity"
+          >
+            <X className="w-3.5 h-3.5 text-white" />
+          </button>
+        )}
       </div>
 
       {/* Progress Bar */}
