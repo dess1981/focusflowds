@@ -1,0 +1,49 @@
+{
+  "name": "ReportPreference",
+  "type": "object",
+  "properties": {
+    "format": {
+      "type": "string",
+      "enum": [
+        "visual",
+        "data",
+        "spreadsheet",
+        "text",
+        "audio"
+      ],
+      "default": "visual",
+      "description": "Formato preferido de relat\u00f3rio"
+    },
+    "include_charts": {
+      "type": "boolean",
+      "default": true,
+      "description": "Incluir gr\u00e1ficos nos relat\u00f3rios"
+    },
+    "include_stats": {
+      "type": "boolean",
+      "default": true,
+      "description": "Incluir estat\u00edsticas detalhadas"
+    },
+    "include_summary": {
+      "type": "boolean",
+      "default": true,
+      "description": "Incluir resumo executivo"
+    },
+    "audio_speed": {
+      "type": "number",
+      "default": 1.0,
+      "description": "Velocidade do \u00e1udio (0.75 a 1.5)"
+    },
+    "report_type": {
+      "type": "string",
+      "enum": [
+        "weekly",
+        "monthly",
+        "daily"
+      ],
+      "default": "weekly",
+      "description": "Tipo padr\u00e3o de relat\u00f3rio"
+    }
+  },
+  "required": []
+}

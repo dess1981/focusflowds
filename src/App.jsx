@@ -20,6 +20,7 @@ import TimeBlocks from './pages/TimeBlocks';
 import AIAssistant from './pages/AIAssistant';
 import Calendar from './pages/Calendar';
 import Templates from './pages/Templates';
+import Reports from './pages/Reports';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -63,6 +64,7 @@ const AuthenticatedApp = () => {
           <Route path="/time-blocks" element={<TimeBlocks />} />
           <Route path="/assistant" element={<AIAssistant />} />
           <Route path="/templates" element={<Templates />} />
+          <Route path="/reports" element={<Reports />} />
         </Route>
       </Route>
 
