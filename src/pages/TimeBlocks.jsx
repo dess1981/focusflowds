@@ -111,13 +111,42 @@ export default function TimeBlocks() {
           recurrence_group_id: editBlock.recurrence_group_id,
         });
       } else if (data.is_template) {
-        // Save as activity block template (no date/time required)
-        await base44.entities.TimeBlock.create({
-          title: data.title,
-          type: data.type,
-          color: data.color,
-          is_template: true,
-        });
+       // Save as activity block template with optional recurrence
+       if (data.recurrence && data.recurrence !== 'none') {
+         // Create recurring template blocks
+         const groupId = crypto.randomUUID();
+         const dates = generateRecurringDates(
+           data.date || format(new Date(), 'yyyy-MM-dd'),
+           data.recurrence,
+           data.recurrence_days || [],
+           data.recurrence_end_date
+         );
+         await base44.entities.TimeBlock.bulkCreate(
+           dates.map(d => ({
+             title: data.title,
+             date: d,
+             start_time: data.start_time,
+             end_time: data.end_time,
+             type: data.type,
+             color: data.color,
+             is_template: false,
+             recurrence: data.recurrence,
+             recurrence_end_date: data.recurrence_end_date,
+             recurrence_days: data.recurrence_days,
+             recurrence_group_id: groupId,
+           }))
+         );
+       } else {
+         // Save as simple template (no recurrence)
+         await base44.entities.TimeBlock.create({
+           title: data.title,
+           type: data.type,
+           color: data.color,
+           start_time: data.start_time,
+           end_time: data.end_time,
+           is_template: true,
+         });
+       }
       } else if (data.recurrence && data.recurrence !== 'none') {
         // Create recurring blocks
         const groupId = crypto.randomUUID();
@@ -457,7 +486,9 @@ export default function TimeBlocks() {
             <DialogTitle>
               {editBlock
                 ? (editBlock.is_template ? 'Editar Bloco de Atividade' : 'Editar Bloco')
-                : (form.is_template ? 'Novo Bloco de Atividade' : 'Novo Bloco de Tempo')}
+                : form.is_template && form.recurrence !== 'none'
+                  ? 'Novo Bloco Recorrente'
+                  : (form.is_template ? 'Novo Bloco de Atividade' : 'Novo Bloco de Tempo')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
@@ -494,31 +525,36 @@ export default function TimeBlocks() {
               </div>
             </div>
 
-            {!form.is_template && (
+            {/* Time fields for both day blocks and recurring templates */}
+            {(!form.is_template || (form.is_template && form.recurrence !== 'none')) && (
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label>Início</Label>
+                    <Label>Início (opcional)</Label>
                     <Input type="time" value={form.start_time} onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))} className="mt-1" />
                   </div>
                   <div>
-                    <Label>Fim</Label>
+                    <Label>Fim (opcional)</Label>
                     <Input type="time" value={form.end_time} onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))} className="mt-1" />
                   </div>
                 </div>
-                <div>
-                  <Label>Data</Label>
-                  <Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} className="mt-1" />
-                </div>
+                {!form.is_template && (
+                  <div>
+                    <Label>Data *</Label>
+                    <Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} className="mt-1" />
+                  </div>
+                )}
               </>
             )}
 
-            {/* Recurrence section — only for non-template blocks */}
-            {!editBlock && !form.is_template && (
+            {/* Recurrence section — for both day blocks and recurring templates */}
+            {!editBlock && (!form.is_template || (form.is_template && form.recurrence !== 'none')) && (
               <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/30">
                 <div className="flex items-center gap-2">
                   <RefreshCw className="w-4 h-4 text-muted-foreground" />
-                  <Label className="text-sm font-semibold">Recorrência</Label>
+                  <Label className="text-sm font-semibold">
+                    {form.is_template ? 'Aplicar em Dias Específicos' : 'Recorrência'}
+                  </Label>
                 </div>
                 <Select value={form.recurrence} onValueChange={v => setForm(f => ({ ...f, recurrence: v, recurrence_days: [] }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -555,13 +591,13 @@ export default function TimeBlocks() {
 
                 {form.recurrence !== 'none' && (
                   <div>
-                    <Label className="text-xs text-muted-foreground">Repetir até (opcional)</Label>
+                    <Label className="text-xs text-muted-foreground">Até quando (opcional)</Label>
                     <Input
                       type="date"
                       value={form.recurrence_end_date}
                       onChange={e => setForm(f => ({ ...f, recurrence_end_date: e.target.value }))}
                       className="mt-1"
-                      min={form.date}
+                      min={form.date || format(new Date(), 'yyyy-MM-dd')}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       Se não definida, repete por até 3 meses
@@ -575,11 +611,12 @@ export default function TimeBlocks() {
             <Button variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
             <Button
               onClick={() => saveMutation.mutate(form)}
-              disabled={!form.title.trim() || saveMutation.isPending}
+              disabled={!form.title.trim() || (form.is_template && form.recurrence !== 'none' && form.recurrence_days.length === 0 && form.recurrence !== 'daily' && form.recurrence !== 'monthly') || saveMutation.isPending}
             >
               {saveMutation.isPending ? 'Salvando...'
                 : editBlock ? 'Salvar'
-                : form.is_template ? 'Criar Bloco de Atividade'
+                : form.is_template && form.recurrence !== 'none' ? 'Criar Blocos Recorrentes'
+                : form.is_template ? 'Criar Modelo'
                 : form.recurrence !== 'none' ? 'Criar Série'
                 : 'Criar Bloco'}
             </Button>
