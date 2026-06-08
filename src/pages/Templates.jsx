@@ -21,6 +21,8 @@ const defaultForm = {
   task_type: 'task', energy_level: 'medium', estimated_minutes: '',
   time_block_start: '', time_block_end: '', category_id: '', project_id: '',
   checklist: [], notes: '',
+  location_name: '', location_address: '', travel_minutes: '', travel_origin: 'ultimo_evento',
+  departure_reminder_minutes: 30,
 };
 
 const EMOJIS = ['📋', '🎯', '⚡', '📞', '✉️', '📊', '🏃', '💡', '🔧', '📝', '🌟', '🔴', '💼', '🏠', '🎓', '💰', '🤝', '🛒'];
@@ -94,6 +96,9 @@ export default function Templates() {
       time_block_start: t.time_block_start || '', time_block_end: t.time_block_end || '',
       category_id: t.category_id || '', project_id: t.project_id || '',
       checklist: t.checklist || [], notes: t.notes || '',
+      location_name: t.location_name || '', location_address: t.location_address || '',
+      travel_minutes: t.travel_minutes || '', travel_origin: t.travel_origin || 'ultimo_evento',
+      departure_reminder_minutes: t.departure_reminder_minutes || 30,
     });
     setDialogOpen(true);
   };
@@ -348,6 +353,42 @@ export default function Templates() {
                 </Select>
               </div>
             </div>
+
+            {/* In-person event fields */}
+            {form.task_type === 'in_person' && (
+              <div className="border border-border rounded-xl p-3 bg-muted/30 space-y-3">
+                <Label className="text-sm font-semibold">📍 Detalhes do Evento Presencial</Label>
+                <div>
+                  <Label className="text-xs">Nome do Local</Label>
+                  <Input value={form.location_name} onChange={e => set('location_name', e.target.value)} placeholder="Ex: Escritório Central, Sala 1" className="mt-1 text-xs" />
+                </div>
+                <div>
+                  <Label className="text-xs">Endereço</Label>
+                  <Input value={form.location_address} onChange={e => set('location_address', e.target.value)} placeholder="Ex: Rua X, 123, São Paulo" className="mt-1 text-xs" />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label className="text-xs">Tempo de Locomoção (min)</Label>
+                    <Input type="number" value={form.travel_minutes} onChange={e => set('travel_minutes', e.target.value)} placeholder="15" className="mt-1 text-xs" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Local de Saída</Label>
+                    <Select value={form.travel_origin} onValueChange={v => set('travel_origin', v)}>
+                      <SelectTrigger className="mt-1 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ultimo_evento">Último evento</SelectItem>
+                        <SelectItem value="casa">Casa</SelectItem>
+                        <SelectItem value="trabalho">Trabalho</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs">Lembrete para Sair (min antes)</Label>
+                  <Input type="number" value={form.departure_reminder_minutes} onChange={e => set('departure_reminder_minutes', e.target.value)} placeholder="30" className="mt-1 text-xs" />
+                </div>
+              </div>
+            )}
 
             {/* Checklist */}
             <div className="border border-border rounded-xl p-3 bg-muted/30">

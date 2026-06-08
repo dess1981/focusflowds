@@ -34,6 +34,11 @@ export default function UseTemplateButton({ onApply }) {
       project_id: t.project_id || '',
       checklist: (t.checklist || []).map(item => ({ ...item, done: false })),
       notes: t.notes || '',
+      location_name: t.location_name || '',
+      location_address: t.location_address || '',
+      travel_minutes: t.travel_minutes || '',
+      travel_origin: t.travel_origin || 'ultimo_evento',
+      departure_reminder_minutes: t.departure_reminder_minutes || 30,
     });
     incrementUse.mutate({ id: t.id, count: t.use_count });
     setOpen(false);
