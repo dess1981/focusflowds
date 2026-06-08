@@ -2,8 +2,10 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
+import { useSmartNotifications } from '@/hooks/useSmartNotifications';
 
 export default function AppLayout() {
+  useSmartNotifications();
   return (
     <div className="min-h-screen">
       <Sidebar />
