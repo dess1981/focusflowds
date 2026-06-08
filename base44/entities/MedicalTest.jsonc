@@ -1,0 +1,60 @@
+{
+  "name": "MedicalTest",
+  "type": "object",
+  "properties": {
+    "test_name": {
+      "type": "string",
+      "description": "Nome do exame (sangue, urina, etc)"
+    },
+    "date_requested": {
+      "type": "string",
+      "format": "date",
+      "description": "Data que foi solicitado"
+    },
+    "date_performed": {
+      "type": "string",
+      "format": "date",
+      "description": "Data que foi realizado"
+    },
+    "date_result": {
+      "type": "string",
+      "format": "date",
+      "description": "Data que ficou pronto o resultado"
+    },
+    "doctor_requested": {
+      "type": "string",
+      "description": "M\u00e9dico que solicitou"
+    },
+    "lab_name": {
+      "type": "string",
+      "description": "Laborat\u00f3rio que realizou"
+    },
+    "result": {
+      "type": "string",
+      "description": "Resultado do exame"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "em_andamento",
+        "realizado",
+        "sem_resultado"
+      ],
+      "default": "pendente",
+      "description": "Status do exame"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL do arquivo com resultado (PDF)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas sobre o resultado"
+    }
+  },
+  "required": [
+    "test_name",
+    "date_requested"
+  ]
+}
