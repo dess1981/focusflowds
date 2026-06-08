@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Button } from '@/components/ui/button';
 import { Pencil, Lock, Clock, Plus } from 'lucide-react';
 import TaskCard from './TaskCard';
-import TaskFormDialog from './TaskFormDialog';
+import TaskFormDialog from './TaskFormDialog.jsx';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 

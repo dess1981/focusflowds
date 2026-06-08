@@ -34,14 +34,36 @@
       "type": "string",
       "enum": [
         "task",
-        "meeting"
+        "meeting",
+        "in_person"
       ],
       "default": "task",
-      "description": "Tipo da tarefa \u2014 'meeting' gera link do Google Meet automaticamente"
+      "description": "Tipo: task=tarefa, meeting=reuni\u00e3o online, in_person=evento presencial"
     },
     "meet_link": {
       "type": "string",
-      "description": "Link do Google Meet gerado para reuni\u00f5es"
+      "description": "Link do Google Meet para reuni\u00f5es online"
+    },
+    "location_address": {
+      "type": "string",
+      "description": "Endere\u00e7o do evento presencial"
+    },
+    "location_name": {
+      "type": "string",
+      "description": "Nome do local (ex: Escrit\u00f3rio Central)"
+    },
+    "travel_minutes": {
+      "type": "number",
+      "description": "Tempo de locomo\u00e7\u00e3o estimado em minutos"
+    },
+    "travel_origin": {
+      "type": "string",
+      "description": "Local de sa\u00edda (endere\u00e7o ou 'ultimo_evento')"
+    },
+    "departure_reminder_minutes": {
+      "type": "number",
+      "description": "Lembrete: quantos minutos antes do evento avisar para sair",
+      "default": 30
     },
     "category_id": {
       "type": "string",
@@ -53,7 +75,7 @@
     },
     "activity_block_id": {
       "type": "string",
-      "description": "ID do bloco de atividade (TimeBlock template) ao qual a tarefa pertence"
+      "description": "ID do bloco de atividade"
     },
     "parent_task_id": {
       "type": "string",
@@ -130,7 +152,7 @@
       "items": {
         "type": "string"
       },
-      "description": "URLs de arquivos do Google Drive anexados"
+      "description": "URLs de arquivos do Google Drive"
     },
     "calendar_event_id": {
       "type": "string",

@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Clock, Calendar, ChevronRight, Video, CheckSquare, GitBranch } from 'lucide-react';
+import { Clock, Calendar, ChevronRight, Video, CheckSquare, GitBranch, MapPin, Navigation } from 'lucide-react';
 import PriorityBadge from './PriorityBadge';
 import StatusBadge from './StatusBadge';
 import { format } from 'date-fns';
@@ -104,6 +104,17 @@ export default function TaskCard({ task, onStatusChange, onClick, compact = fals
                 }}
               />
             </div>
+          </div>
+        )}
+
+        {/* In-person location badge */}
+        {task.task_type === 'in_person' && task.location_address && (
+          <div className="mt-1.5 flex items-center gap-1.5 text-xs" style={{ color: '#fb923c' }}>
+            <MapPin className="w-3 h-3 flex-shrink-0" />
+            <span className="truncate">{task.location_name || task.location_address}</span>
+            {task.travel_minutes && (
+              <span className="flex-shrink-0 opacity-70">· {task.travel_minutes}min</span>
+            )}
           </div>
         )}
 

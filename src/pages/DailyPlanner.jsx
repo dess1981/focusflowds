@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChevronLeft, ChevronRight, Plus, CalendarDays, Sun, Sunrise, Moon, Sparkles, Search, X } from 'lucide-react';
 import TaskCard from '@/components/tasks/TaskCard';
-import TaskFormDialog from '@/components/tasks/TaskFormDialog';
+import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 

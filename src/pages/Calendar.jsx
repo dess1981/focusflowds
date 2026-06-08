@@ -9,7 +9,7 @@ import { ptBR } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Plus, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import TaskFormDialog from '@/components/tasks/TaskFormDialog';
+import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import TaskListDrawer from '@/components/tasks/TaskListDrawer';
 import { useGoogleCalendarEvents, GoogleCalendarConnectButton } from '@/components/calendar/GoogleCalendarEvents';
 import { startOfMonth, endOfMonth } from 'date-fns';

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Search, LayoutList, Kanban } from 'lucide-react';
 import TaskCard from '@/components/tasks/TaskCard';
-import TaskFormDialog from '@/components/tasks/TaskFormDialog';
+import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import KanbanBoard from '@/components/tasks/KanbanBoard';
 import { AnimatePresence, motion } from 'framer-motion';
 
