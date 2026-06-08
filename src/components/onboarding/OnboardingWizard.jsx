@@ -5,12 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { CheckCircle2, ArrowRight, Calendar, Zap, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
+import VoicePermissionStep from './VoicePermissionStep';
 
 const STEPS = [
   { id: 'welcome', title: 'Bem-vindo', icon: '👋' },
   { id: 'focus', title: 'Preferências de Foco', icon: '⚡' },
   { id: 'calendar', title: 'Google Calendar', icon: '📅' },
   { id: 'health', title: 'Saúde', icon: '❤️' },
+  { id: 'voice', title: 'Comandos de Voz', icon: '🎤' },
   { id: 'complete', title: 'Pronto!', icon: '✨' },
 ];
 
@@ -227,8 +229,17 @@ export default function OnboardingWizard({ onComplete }) {
         <div className="flex gap-3">
           <Button variant="outline" onClick={() => setCurrentStep(2)}>Anterior</Button>
           <Button onClick={() => setCurrentStep(4)}>
-            Finalizar <ArrowRight className="ml-2 w-4 h-4" />
+            Próximo <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
+        </div>
+      </div>
+    ),
+
+    voice: (
+      <div className="space-y-6">
+        <VoicePermissionStep onComplete={() => setCurrentStep(5)} />
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={() => setCurrentStep(3)}>Anterior</Button>
         </div>
       </div>
     ),
