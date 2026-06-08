@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Pill, Brain, BookOpen } from 'lucide-react';
+import { Pill, Brain, BookOpen, Calendar, Microscope, Wind, Bell } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import DailyDiaryPanel from './DailyDiaryPanel';
@@ -33,64 +33,80 @@ export default function HealthHub() {
 
   const medTakenToday = medLogs.filter(log => log.taken).length;
 
+  const tabs = [
+    { value: 'diary', label: 'Diário', icon: BookOpen },
+    { value: 'today', label: 'Hoje', icon: Pill },
+    { value: 'manage', label: 'Medicação', icon: Pill },
+    { value: 'appointments', label: 'Consultas', icon: Calendar },
+    { value: 'tests', label: 'Exames', icon: Microscope },
+    { value: 'meditate', label: 'Meditação', icon: Wind },
+    { value: 'learn', label: 'TDAH', icon: Brain },
+    { value: 'settings', label: 'Alertas', icon: Bell },
+  ];
+
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-heading font-bold tracking-tight flex items-center gap-2">
-          💚 Saúde & Bem-estar
+        <h2 className="text-lg sm:text-xl font-heading font-bold tracking-tight flex items-center gap-2">
+          <Wind className="w-5 h-5 text-accent" />
+          Saúde & Bem-estar
         </h2>
         <p className="text-xs text-muted-foreground mt-1">
-          Cuide de você: medicação, meditação e conhecimento sobre TDAH
+          Cuide de você: medicação, meditação e conhecimento
         </p>
       </div>
 
       <Tabs defaultValue="diary" className="w-full">
-        <TabsList className="grid w-full grid-cols-8">
-          <TabsTrigger value="diary" className="text-xs">📔 Diário</TabsTrigger>
-          <TabsTrigger value="today" className="text-xs flex items-center gap-1">
-            <Pill className="w-3 h-3" />
-            Hoje
-          </TabsTrigger>
-          <TabsTrigger value="manage" className="text-xs">💊 Meds</TabsTrigger>
-          <TabsTrigger value="appointments" className="text-xs">📅 Consultas</TabsTrigger>
-          <TabsTrigger value="tests" className="text-xs">🩺 Exames</TabsTrigger>
-          <TabsTrigger value="meditate" className="text-xs">🧘 Meditar</TabsTrigger>
-          <TabsTrigger value="learn" className="text-xs">📚 TDAH</TabsTrigger>
-          <TabsTrigger value="settings" className="text-xs">🔔 Alertas</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 sm:grid-cols-8 gap-1">
+          {tabs.map(tab => {
+            const Icon = tab.icon;
+            return (
+              <TabsTrigger 
+                key={tab.value}
+                value={tab.value} 
+                className="text-xs flex items-center justify-center gap-1 p-2 h-9"
+              >
+                <Icon className="w-4 h-4 hidden sm:inline" />
+                <span className="line-clamp-1">{tab.label}</span>
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
-        <TabsContent value="diary" className="mt-3">
-          <DailyDiaryPanel />
-        </TabsContent>
+        <div className="mt-3 overflow-hidden">
+          <TabsContent value="diary" className="mt-0">
+            <DailyDiaryPanel />
+          </TabsContent>
 
-        <TabsContent value="today" className="mt-3 space-y-3">
-          <MedicationTracker medications={medications} medLogs={medLogs} medTakenToday={medTakenToday} />
-          <MedicationHistoryPanel />
-        </TabsContent>
+          <TabsContent value="today" className="mt-0 space-y-3">
+            <MedicationTracker medications={medications} medLogs={medLogs} medTakenToday={medTakenToday} />
+            <MedicationHistoryPanel />
+          </TabsContent>
 
-        <TabsContent value="manage" className="mt-3 space-y-3">
-          <MedicationManager />
-        </TabsContent>
+          <TabsContent value="manage" className="mt-0 space-y-3">
+            <MedicationManager />
+          </TabsContent>
 
-        <TabsContent value="appointments" className="mt-3">
-          <MedicalAppointmentsPanel />
-        </TabsContent>
+          <TabsContent value="appointments" className="mt-0">
+            <MedicalAppointmentsPanel />
+          </TabsContent>
 
-        <TabsContent value="tests" className="mt-3">
-          <MedicalTestsPanel />
-        </TabsContent>
+          <TabsContent value="tests" className="mt-0">
+            <MedicalTestsPanel />
+          </TabsContent>
 
-        <TabsContent value="meditate" className="mt-3">
-          <MeditationHub />
-        </TabsContent>
+          <TabsContent value="meditate" className="mt-0">
+            <MeditationHub />
+          </TabsContent>
 
-        <TabsContent value="learn" className="mt-3">
-          <TdahResources />
-        </TabsContent>
+          <TabsContent value="learn" className="mt-0">
+            <TdahResources />
+          </TabsContent>
 
-        <TabsContent value="settings" className="mt-3">
-          <HealthNotificationSettings />
-        </TabsContent>
+          <TabsContent value="settings" className="mt-0">
+            <HealthNotificationSettings />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
