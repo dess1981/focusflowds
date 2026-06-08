@@ -24,9 +24,9 @@ function getDuration(start, end) {
 }
 
 export default function TimeBlocksAnalytics({ blocks, selectedDate }) {
-  const [period, setPeriod] = React.useState('week');
-  const [customStart, setCustomStart] = React.useState('');
-  const [customEnd, setCustomEnd] = React.useState('');
+   const [period, setPeriod] = useState('week');
+   const [customStart, setCustomStart] = useState('');
+   const [customEnd, setCustomEnd] = useState('');
 
   const dateRange = useMemo(() => {
     let start, end;

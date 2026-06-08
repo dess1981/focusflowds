@@ -7,12 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Clock, ChevronLeft, ChevronRight, Trash2, RefreshCw, Layers, Calendar, BarChart3 } from 'lucide-react';
+import { Plus, Clock, ChevronLeft, ChevronRight, Trash2, RefreshCw, BarChart3 } from 'lucide-react';
 import { format, addDays, subDays, isToday, addWeeks, addMonths, parseISO, isBefore, isAfter, getDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import TimeBlocksCalendar from '@/components/timeblocks/TimeBlocksCalendar';
+
 import TimeBlocksAnalytics from '@/components/timeblocks/TimeBlocksAnalytics';
 
 const typeConfig = {
@@ -281,42 +281,31 @@ export default function TimeBlocks() {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Abas */}
-          <div className="flex items-center border border-border rounded-lg p-1 bg-muted/50">
-            <button
-              onClick={() => setActiveTab('list')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                activeTab === 'list'
-                  ? 'bg-background shadow-sm text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Clock className="w-3.5 h-3.5" />
-              Timeline
-            </button>
-            <button
-              onClick={() => setActiveTab('calendar')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                activeTab === 'calendar'
-                  ? 'bg-background shadow-sm text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              Calendário
-            </button>
-            <button
-              onClick={() => setActiveTab('analytics')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                activeTab === 'analytics'
-                  ? 'bg-background shadow-sm text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-              Análise
-            </button>
-          </div>
+           {/* Abas */}
+           <div className="flex items-center border border-border rounded-lg p-1 bg-muted/50">
+             <button
+               onClick={() => setActiveTab('list')}
+               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                 activeTab === 'list'
+                   ? 'bg-background shadow-sm text-primary'
+                   : 'text-muted-foreground hover:text-foreground'
+               }`}
+             >
+               <Clock className="w-3.5 h-3.5" />
+               Timeline
+             </button>
+             <button
+               onClick={() => setActiveTab('analytics')}
+               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                 activeTab === 'analytics'
+                   ? 'bg-background shadow-sm text-primary'
+                   : 'text-muted-foreground hover:text-foreground'
+               }`}
+             >
+               <BarChart3 className="w-3.5 h-3.5" />
+               Análise
+             </button>
+           </div>
 
           {/* Navegação de data */}
           <Button variant="outline" size="icon" onClick={() => setSelectedDate(d => subDays(d, 1))}>
@@ -340,19 +329,9 @@ export default function TimeBlocks() {
       </p>
 
       {/* Conteúdo por Aba */}
-      {activeTab === 'calendar' && (
-        <TimeBlocksCalendar
-          blocks={blocks}
-          selectedDate={selectedDate}
-          onDateClick={setSelectedDate}
-          onPrevMonth={() => setSelectedDate(d => subDays(d, 30))}
-          onNextMonth={() => setSelectedDate(d => addDays(d, 30))}
-        />
-      )}
-
-      {activeTab === 'analytics' && (
-        <TimeBlocksAnalytics blocks={blocks} selectedDate={selectedDate} />
-      )}
+       {activeTab === 'analytics' && (
+         <TimeBlocksAnalytics blocks={blocks} selectedDate={selectedDate} />
+       )}
 
       {activeTab === 'list' && (
         <>
