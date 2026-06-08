@@ -39,7 +39,7 @@ export default function TaskCard({ task, onStatusChange, onClick, onRefresh, com
     <div
       onClick={onClick}
       className={cn(
-        "group flex items-start gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer",
+        "group flex flex-col sm:flex-row sm:items-start gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer",
         task.status === 'done' && "opacity-50",
         compact && "py-2"
       )}
@@ -57,30 +57,31 @@ export default function TaskCard({ task, onStatusChange, onClick, onRefresh, com
         e.currentTarget.style.border = '1px solid rgba(255,255,255,0.09)';
       }}
     >
-      <StatusBadge
-        status={task.status}
-        onClick={(e) => {
-          e.stopPropagation();
-          onStatusChange?.(task, nextStatus[task.status]);
-        }}
-      />
+      <div className="flex items-start gap-3 flex-1 min-w-0 sm:flex-1">
+        <StatusBadge
+          status={task.status}
+          onClick={(e) => {
+            e.stopPropagation();
+            onStatusChange?.(task, nextStatus[task.status]);
+          }}
+        />
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className={cn(
-            "text-sm font-medium truncate text-white/90",
-            task.status === 'done' && "line-through text-white/40"
-          )}>
-            {task.title}
-          </p>
-          {task.parent_task_id && parentTask && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30 whitespace-nowrap flex-shrink-0">
-              📌 {parentTask.title}
-            </span>
-          )}
-        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 sm:flex-wrap">
+            <p className={cn(
+              "text-sm font-medium text-white/90",
+              task.status === 'done' && "line-through text-white/40"
+            )}>
+              {task.title}
+            </p>
+            {task.parent_task_id && parentTask && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30 whitespace-nowrap flex-shrink-0 w-fit">
+                📌 {parentTask.title}
+              </span>
+            )}
+          </div>
 
-        <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+          <div className="flex items-center gap-3 mt-1.5 flex-wrap">
           <PriorityBadge priority={task.priority} />
           
           {task.time_block_start && task.time_block_end && (
@@ -153,15 +154,16 @@ export default function TaskCard({ task, onStatusChange, onClick, onRefresh, com
               border: '1px solid rgba(34,211,238,0.25)',
             }}
           >
-            <Video className="w-3 h-3" />
-            Entrar na reunião
+           <Video className="w-3 h-3" />
+           Entrar na reunião
           </a>
-        )}
-      </div>
+          )}
+          </div>
+          </div>
 
-      {/* Right side: focus buttons + chevron */}
-      <div className="flex flex-col items-end gap-1.5">
-        {task.status !== 'done' && task.status !== 'cancelled' && (
+          {/* Right side: focus buttons + chevron */}
+          <div className="flex flex-col sm:items-end gap-1.5 self-start sm:self-center">
+          {task.status !== 'done' && task.status !== 'cancelled' && (
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={e => {
