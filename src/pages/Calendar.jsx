@@ -16,10 +16,17 @@ import { startOfMonth, endOfMonth } from 'date-fns';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
 const priorityColors = {
-  urgent: 'bg-red-500',
-  high: 'bg-orange-400',
-  medium: 'bg-blue-500',
-  low: 'bg-slate-400',
+  urgent: 'bg-rose-500',
+  high: 'bg-amber-500',
+  medium: 'bg-cyan-500',
+  low: 'bg-slate-500',
+};
+
+const taskColorStyles = {
+  urgent: { bgColor: '#f43f5e', bgLight: 'rgba(244, 63, 94, 0.15)', border: 'rgba(244, 63, 94, 0.4)' },
+  high: { bgColor: '#f59e0b', bgLight: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.4)' },
+  medium: { bgColor: '#06b6d4', bgLight: 'rgba(6, 182, 212, 0.15)', border: 'rgba(6, 182, 212, 0.4)' },
+  low: { bgColor: '#64748b', bgLight: 'rgba(100, 116, 139, 0.15)', border: 'rgba(100, 116, 139, 0.4)' },
 };
 
 export default function Calendar() {
@@ -239,8 +246,13 @@ export default function Calendar() {
                     return (
                       <div
                         key={ev.id}
-                        className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate font-medium opacity-60"
-                        style={{ backgroundColor: '#EA433520', color: '#EA4335', border: '1px solid #EA433540' }}
+                        className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs truncate font-medium backdrop-blur-sm transition-all hover:shadow-md"
+                        style={{ 
+                          backgroundColor: 'rgba(244, 63, 94, 0.12)',
+                          color: '#f43f5e',
+                          border: '1px solid rgba(244, 63, 94, 0.35)',
+                          boxShadow: '0 4px 12px rgba(244, 63, 94, 0.08)'
+                        }}
                         title={`📅 ${ev.summary}${startTime ? ` ${startTime}` : ''}`}
                       >
                         <span className="truncate">{ev.summary || '(sem título)'}</span>
@@ -249,37 +261,54 @@ export default function Calendar() {
                     );
                   })}
 
-                  {visibleBlocks.map(block => (
-                    <div
-                      key={block.id}
-                      className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate font-medium opacity-60"
-                      style={{ backgroundColor: `${block.color || '#4F6BED'}20`, color: block.color || '#4F6BED', border: `1px solid ${block.color || '#4F6BED'}40` }}
-                      title={`🔒 ${block.title}`}
-                    >
-                      <Lock className="w-2.5 h-2.5 flex-shrink-0" />
-                      <span className="truncate">{block.title}</span>
-                    </div>
-                  ))}
+                  {visibleBlocks.map(block => {
+                    const blockColor = block.color || '#4F6BED';
+                    return (
+                      <div
+                        key={block.id}
+                        className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs truncate font-medium backdrop-blur-sm transition-all hover:shadow-md"
+                        style={{
+                          backgroundColor: `${blockColor}15`,
+                          color: blockColor,
+                          border: `1px solid ${blockColor}45`,
+                          boxShadow: `0 4px 12px ${blockColor}12`
+                        }}
+                        title={`🔒 ${block.title}`}
+                      >
+                        <Lock className="w-2.5 h-2.5 flex-shrink-0" />
+                        <span className="truncate">{block.title}</span>
+                      </div>
+                    );
+                  })}
 
-                  {visibleTasks.map((task, taskIdx) => (
-                    <Draggable key={task.id} draggableId={`task-${task.id}`} index={taskIdx}>
-                      {(dragProvided, dragSnapshot) => (
-                    <div
-                      ref={dragProvided.innerRef}
-                      {...dragProvided.draggableProps}
-                      {...dragProvided.dragHandleProps}
-                      className={cn(
-                        "flex items-center gap-1 px-1.5 py-0.5 rounded text-xs truncate transition-all",
-                        dragSnapshot.isDragging && "opacity-50 scale-95",
-                        task.status === 'done' ? "bg-muted text-muted-foreground line-through" : "bg-primary/10 text-primary font-medium cursor-move hover:bg-primary/20"
-                      )}
-                    >
-                      <div className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", priorityColors[task.priority] || 'bg-slate-400')} />
-                      <span className="truncate">{task.title}</span>
-                    </div>
-                      )}
-                    </Draggable>
-                  ))}
+                  {visibleTasks.map((task, taskIdx) => {
+                    const taskStyle = taskColorStyles[task.priority] || taskColorStyles.low;
+                    return (
+                      <Draggable key={task.id} draggableId={`task-${task.id}`} index={taskIdx}>
+                        {(dragProvided, dragSnapshot) => (
+                      <div
+                        ref={dragProvided.innerRef}
+                        {...dragProvided.draggableProps}
+                        {...dragProvided.dragHandleProps}
+                        className={cn(
+                          "flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs truncate font-medium transition-all backdrop-blur-sm",
+                          dragSnapshot.isDragging && "opacity-50 scale-95",
+                          task.status === 'done' ? "bg-muted/40 text-muted-foreground line-through" : "cursor-move hover:shadow-md"
+                        )}
+                        style={task.status === 'done' ? {} : {
+                          backgroundColor: taskStyle.bgLight,
+                          color: taskStyle.bgColor,
+                          border: `1px solid ${taskStyle.border}`,
+                          boxShadow: `0 4px 12px ${taskStyle.bgColor}10`
+                        }}
+                      >
+                        <div className={cn("w-2 h-2 rounded-full flex-shrink-0", priorityColors[task.priority] || 'bg-slate-500')} style={task.status === 'done' ? {} : { backgroundColor: taskStyle.bgColor }} />
+                        <span className="truncate">{task.title}</span>
+                      </div>
+                        )}
+                      </Draggable>
+                    );
+                  })}
 
                   {totalHidden > 0 && (
                     <div className="text-xs text-muted-foreground px-1">+{totalHidden} mais</div>
