@@ -1,17 +1,41 @@
 {
-  "properties": {
-    "role": {
-      "type": "string",
-      "description": "The role of the user in the app",
-      "enum": [
-        "admin",
-        "user"
-      ]
-    }
-  },
-  "required": [
-    "role"
-  ],
   "name": "User",
-  "type": "object"
+  "type": "object",
+  "properties": {
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "free",
+        "active",
+        "trial",
+        "cancelled"
+      ],
+      "default": "free",
+      "description": "Status da assinatura do usu\u00e1rio"
+    },
+    "subscription_plan": {
+      "type": "string",
+      "enum": [
+        "none",
+        "pro_monthly",
+        "pro_annual"
+      ],
+      "default": "none",
+      "description": "Plano de assinatura ativo"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "description": "ID do cliente no Stripe"
+    },
+    "trial_ends_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data de t\u00e9rmino do per\u00edodo de teste"
+    },
+    "subscription_ends_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data de t\u00e9rmino da assinatura"
+    }
+  }
 }
