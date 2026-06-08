@@ -27,6 +27,7 @@ import DailyTaskList from './pages/DailyTaskList';
 import Health from './pages/Health';
 import GmailIntegration from './pages/GmailIntegration';
 import EmailManager from './pages/EmailManager';
+import Settings from './pages/Settings';
 import Onboarding from './pages/Onboarding';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -78,6 +79,7 @@ const AuthenticatedApp = () => {
           <Route path="/health" element={<Health />} />
           <Route path="/gmail" element={<GmailIntegration />} />
           <Route path="/email-manager" element={<EmailManager />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Route>
 

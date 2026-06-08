@@ -8,9 +8,11 @@ import FocusModeModal from '@/components/focus/FocusModeModal';
 import OverloadWarning from '@/components/alerts/OverloadWarning';
 import { useSmartNotifications } from '@/hooks/useSmartNotifications';
 import { useFocusMode } from '@/context/FocusModeContext';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function AppLayout() {
   useSmartNotifications();
+  useTheme(); // Inicializa tema
   const { focusTaskId, exitFocusMode } = useFocusMode();
 
   return (
