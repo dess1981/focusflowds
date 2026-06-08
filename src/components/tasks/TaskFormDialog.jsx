@@ -43,8 +43,8 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
   });
 
   const { data: activityBlocks = [] } = useQuery({
-    queryKey: ['timeblocks-templates'],
-    queryFn: () => base44.entities.TimeBlock.filter({ is_template: true }),
+    queryKey: ['timeblocks-all'],
+    queryFn: () => base44.entities.TimeBlock.list('-created_date', 200),
   });
 
   useEffect(() => {
@@ -184,7 +184,7 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
               </Select>
               {activityBlocks.length === 0 && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  Crie blocos de atividade na página "Blocos de Tempo"
+                  Nenhum bloco criado ainda. Crie blocos na página "Blocos de Tempo".
                 </p>
               )}
             </div>
