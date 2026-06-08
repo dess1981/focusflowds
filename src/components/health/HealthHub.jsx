@@ -17,9 +17,11 @@ import MedicalTestsPanel from './MedicalTestsPanel';
 import MeditationHub from './MeditationHub';
 import TdahResources from './TdahResources';
 import HealthNotificationSettings from './HealthNotificationSettings';
+import CompactCalendar from '@/components/CompactCalendar';
 
 export default function HealthHub() {
   const today = format(new Date(), 'yyyy-MM-dd');
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const { data: medications = [] } = useQuery({
     queryKey: ['medications'],
@@ -34,6 +36,7 @@ export default function HealthHub() {
   const medTakenToday = medLogs.filter(log => log.taken).length;
 
   const tabs = [
+    { value: 'calendar', label: 'Calendário', icon: Calendar },
     { value: 'diary', label: 'Emocional', icon: BookOpen },
     { value: 'today', label: 'Atividades Diárias', icon: Pill },
     { value: 'manage', label: 'Meus Medicamentos', icon: Pill },
@@ -74,6 +77,10 @@ export default function HealthHub() {
         </TabsList>
 
         <div className="mt-3 overflow-hidden">
+          <TabsContent value="calendar" className="mt-0">
+            <CompactCalendar selectedDate={selectedDate} onDateSelect={setSelectedDate} />
+          </TabsContent>
+
           <TabsContent value="diary" className="mt-0">
             <DailyDiaryPanel />
           </TabsContent>
