@@ -115,25 +115,33 @@ export default function TimeBlocksCalendar({ blocks, selectedDate, onDateClick, 
                 <span className="text-xs font-medium text-start">{format(day, 'd')}</span>
                 
                 {hasBlocks ? (
-                  <div className="flex h-1.5 rounded-full overflow-hidden gap-0 bg-muted/30 w-full">
-                    {Object.entries(stats.percentages)
-                      .sort((a, b) => b[1] - a[1])
-                      .map(([type, percentage]) => 
-                        percentage > 0 ? (
-                          <div
-                            key={type}
-                            className="transition-all"
-                            style={{
-                              width: `${percentage}%`,
-                              backgroundColor: typeConfig[type]?.hex || '#6B7280',
-                            }}
-                            title={`${type}: ${percentage}%`}
-                          />
-                        ) : null
-                      )}
+                  <div className="space-y-1 w-full">
+                    <div className="flex h-1.5 rounded-full overflow-hidden gap-0 bg-muted/30 w-full">
+                      {Object.entries(stats.percentages)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([type, percentage]) => 
+                          percentage > 0 ? (
+                            <div
+                              key={type}
+                              className="transition-all"
+                              style={{
+                                width: `${percentage}%`,
+                                backgroundColor: typeConfig[type]?.hex || '#6B7280',
+                              }}
+                              title={`${type}: ${percentage}%`}
+                            />
+                          ) : null
+                        )}
+                    </div>
+                    <span className="text-[10px] text-muted-foreground font-medium">
+                      {Math.floor(stats.totalMinutes / 60)}h {stats.totalMinutes % 60}m
+                    </span>
                   </div>
                 ) : (
-                  <div className="h-1.5 rounded-full bg-muted/20 w-full" />
+                  <div className="space-y-1 w-full">
+                    <div className="h-1.5 rounded-full bg-muted/20 w-full" />
+                    <span className="text-[10px] text-muted-foreground">0h</span>
+                  </div>
                 )}
               </button>
             );
