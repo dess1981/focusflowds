@@ -133,9 +133,9 @@ export default function Calendar() {
       </div>
 
       {/* Calendar grid */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      <div className="border border-border rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
         {/* Week day headers */}
-        <div className="grid grid-cols-7 border-b border-border">
+        <div className="grid grid-cols-7 border-b border-border" style={{ background: 'rgba(255,255,255,0.06)' }}>
           {WEEK_LABELS_DESKTOP.map((l, i) => (
             <div key={l + i} className="py-2 text-center text-xs font-semibold text-muted-foreground">
               <span className="hidden sm:inline">{l}</span>
@@ -171,9 +171,9 @@ export default function Calendar() {
                 onClick={() => handleDayClick(day)}
                 className={cn(
                   "min-h-[64px] sm:min-h-[90px] p-1 sm:p-1.5 border-b border-r border-border cursor-pointer transition-colors",
-                  "hover:bg-muted/50 active:bg-muted/70",
-                  !isCurrentMonth && "bg-muted/20",
-                  hasBlocks && "bg-amber-50/40 dark:bg-amber-900/10",
+                  "hover:bg-white/10 active:bg-white/15",
+                  !isCurrentMonth && "bg-black/10",
+                  hasBlocks && "bg-amber-300/10",
                   idx % 7 === 6 && "border-r-0",
                   Math.floor(idx / 7) === Math.floor((calendarDays.length - 1) / 7) && "border-b-0"
                 )}
