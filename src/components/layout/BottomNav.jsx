@@ -7,7 +7,6 @@ import BottomNavCustomizer from './BottomNavCustomizer';
 const mainItems = [
   { path: '/', icon: CalendarDays, label: 'Planner' },
   { path: '/tasks', icon: ListTodo, label: 'Tarefas' },
-  { type: 'voice', icon: Mic, label: 'Voz' },
   { path: '/assistant', icon: Brain, label: 'IA' },
   { path: '/email-manager', icon: Sparkles, label: 'Gmail' },
 ];
