@@ -15,7 +15,7 @@ const COLORS = ['#4F6BED', '#2ECC94', '#F4A940', '#FF6B6B', '#9B59B6', '#1ABC9C'
 export default function Categories() {
   const [showForm, setShowForm] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
-  const [form, setForm] = useState({ name: '', color: '#4F6BED' });
+  const [form, setForm] = useState({ name: '', color: '#4F6BED', daily_goal_hours: 0 });
   const [drawerCategory, setDrawerCategory] = useState(null);
   const queryClient = useQueryClient();
 
@@ -51,10 +51,14 @@ export default function Categories() {
   const openForm = (cat) => {
     if (cat) {
       setEditCategory(cat);
-      setForm({ name: cat.name, color: cat.color || '#4F6BED' });
+      setForm({ 
+        name: cat.name, 
+        color: cat.color || '#4F6BED',
+        daily_goal_hours: cat.daily_goal_hours || 0
+      });
     } else {
       setEditCategory(null);
-      setForm({ name: '', color: '#4F6BED' });
+      setForm({ name: '', color: '#4F6BED', daily_goal_hours: 0 });
     }
     setShowForm(true);
   };
@@ -153,6 +157,19 @@ export default function Categories() {
                   />
                 ))}
               </div>
+            </div>
+            <div>
+              <Label>Meta Diária (horas)</Label>
+              <Input 
+                type="number" 
+                min="0" 
+                step="0.5" 
+                value={form.daily_goal_hours} 
+                onChange={e => setForm(f => ({ ...f, daily_goal_hours: parseFloat(e.target.value) || 0 }))} 
+                placeholder="Ex: 8 para 8 horas" 
+                className="mt-1" 
+              />
+              <p className="text-xs text-muted-foreground mt-1">Deixe em branco ou 0 para não definir meta</p>
             </div>
           </div>
           <DialogFooter>

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import PriorityBadge from '@/components/tasks/PriorityBadge';
+import CategoryGoalBar from '@/components/categories/CategoryGoalBar';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -52,7 +53,32 @@ export default function Dashboard() {
     queryFn: () => base44.entities.Category.list(),
   });
 
+  const { data: timeBlocks = [] } = useQuery({
+    queryKey: ['timeblocks'],
+    queryFn: () => base44.entities.TimeBlock.list('-created_date', 500),
+  });
+
   const today = format(new Date(), 'yyyy-MM-dd');
+
+  const categoryHours = useMemo(() => {
+    const hours = {};
+    categories.forEach(cat => { hours[cat.id] = 0; });
+
+    timeBlocks.filter(b => b.date === today).forEach(block => {
+      const category = categories.find(c => 
+        tasks.some(t => t.id === block.task_id && t.category_id === c.id)
+      );
+
+      if (category && block.start_time && block.end_time) {
+        const [sh, sm] = block.start_time.split(':').map(Number);
+        const [eh, em] = block.end_time.split(':').map(Number);
+        const minutes = (eh * 60 + em) - (sh * 60 + sm);
+        hours[category.id] = (hours[category.id] || 0) + minutes / 60;
+      }
+    });
+
+    return hours;
+  }, [timeBlocks, categories, tasks, today]);
 
   const stats = useMemo(() => {
     const todayTasks = tasks.filter(t => t.due_date === today);
@@ -172,6 +198,31 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Category Goals */}
+      {categories.some(c => c.daily_goal_hours > 0) && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">Metas Diárias</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {categories
+                .filter(c => c.daily_goal_hours > 0)
+                .map(cat => (
+                  <div key={cat.id} className="space-y-2">
+                    <p className="text-sm font-medium">{cat.name}</p>
+                    <CategoryGoalBar 
+                      category={cat} 
+                      currentHours={categoryHours[cat.id] || 0}
+                      showLabel={false}
+                    />
+                  </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Bottom Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
