@@ -12,6 +12,7 @@ import { RefreshCw, Clock, Video, ExternalLink, Copy, CheckSquare, GitBranch, Ma
 import ChecklistEditor from './ChecklistEditor';
 import SubtasksEditor from './SubtasksEditor';
 import InPersonEventSection from './InPersonEventSection';
+import MeetInviteSection from './MeetInviteSection';
 
 const WEEK_DAYS = [
   { label: 'Dom', value: 0 },
@@ -232,6 +233,17 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
                   >
                     🔄 Gerar novo link
                   </button>
+
+                  {/* Divider */}
+                  <div className="border-t border-white/10 pt-3">
+                    <MeetInviteSection
+                      meetLink={form.meet_link}
+                      title={form.title}
+                      dueDate={form.due_date}
+                      startTime={form.time_block_start}
+                      endTime={form.time_block_end}
+                    />
+                  </div>
                 </>
               )}
             </div>
