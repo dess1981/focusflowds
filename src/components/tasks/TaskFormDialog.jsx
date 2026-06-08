@@ -462,11 +462,16 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
               <TaskComments
                 comments={task?.comments || []}
                 onAddComment={async (text) => {
-                  await base44.functions.invoke('addTaskComment', {
-                    taskId: task.id,
-                    text
-                  });
-                  onSave?.();
+                  try {
+                    await base44.functions.invoke('addTaskComment', {
+                      taskId: task.id,
+                      text
+                    });
+                    await base44.entities.Task.get(task.id);
+                    onSave?.();
+                  } catch (error) {
+                    console.error('Erro ao adicionar comentário:', error);
+                  }
                 }}
               />
             </div>
