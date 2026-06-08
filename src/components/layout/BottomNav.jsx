@@ -4,6 +4,24 @@ import { CalendarDays, ListTodo, LayoutDashboard, Sparkles, LayoutTemplate, Fold
 import { cn } from '@/lib/utils';
 import BottomNavCustomizer from './BottomNavCustomizer';
 
+const iconMap = {
+  'Planner': CalendarDays,
+  'Tarefas': ListTodo,
+  'IA': Brain,
+  'Gmail': Sparkles,
+  'Hoje': CheckCircle2,
+  'Projetos': FolderKanban,
+  'Blocos': Clock,
+  'Calendário': Calendar,
+  'Templates': LayoutTemplate,
+  'Saúde': Heart,
+  'Dashboard': LayoutDashboard,
+  'Relatórios': BarChart3,
+  'Análise': TrendingUp,
+  'Categorias': Tag,
+  'Config': Settings,
+};
+
 const mainItems = [
   { path: '/', icon: CalendarDays, label: 'Planner' },
   { path: '/tasks', icon: ListTodo, label: 'Tarefas' },
@@ -38,7 +56,12 @@ export default function BottomNav() {
   useEffect(() => {
     const saved = localStorage.getItem('customBottomNav');
     if (saved) {
-      setCustomItems(JSON.parse(saved));
+      const parsed = JSON.parse(saved);
+      const withIcons = parsed.map(item => ({
+        ...item,
+        icon: item.icon || iconMap[item.label] || CalendarDays
+      }));
+      setCustomItems(withIcons);
     }
   }, []);
 
