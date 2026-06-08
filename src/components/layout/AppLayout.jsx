@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
 import MedicationReminders from '@/components/health/MedicationReminders';
+import GlobalSearch from '@/components/GlobalSearch';
 import { useSmartNotifications } from '@/hooks/useSmartNotifications';
 
 export default function AppLayout() {
@@ -17,6 +18,7 @@ export default function AppLayout() {
       </main>
       <BottomNav />
       <MedicationReminders />
+      <GlobalSearch />
     </div>
   );
 }
