@@ -16,6 +16,7 @@ import MedicalAppointmentsPanel from './MedicalAppointmentsPanel';
 import MedicalTestsPanel from './MedicalTestsPanel';
 import MeditationHub from './MeditationHub';
 import TdahResources from './TdahResources';
+import HealthNotificationSettings from './HealthNotificationSettings';
 
 export default function HealthHub() {
   const today = format(new Date(), 'yyyy-MM-dd');
@@ -44,7 +45,7 @@ export default function HealthHub() {
       </div>
 
       <Tabs defaultValue="diary" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="diary" className="text-xs">📔 Diário</TabsTrigger>
           <TabsTrigger value="today" className="text-xs flex items-center gap-1">
             <Pill className="w-3 h-3" />
@@ -55,6 +56,7 @@ export default function HealthHub() {
           <TabsTrigger value="tests" className="text-xs">🩺 Exames</TabsTrigger>
           <TabsTrigger value="meditate" className="text-xs">🧘 Meditar</TabsTrigger>
           <TabsTrigger value="learn" className="text-xs">📚 TDAH</TabsTrigger>
+          <TabsTrigger value="settings" className="text-xs">🔔 Alertas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="diary" className="mt-3">
@@ -84,6 +86,10 @@ export default function HealthHub() {
 
         <TabsContent value="learn" className="mt-3">
           <TdahResources />
+        </TabsContent>
+
+        <TabsContent value="settings" className="mt-3">
+          <HealthNotificationSettings />
         </TabsContent>
       </Tabs>
     </div>

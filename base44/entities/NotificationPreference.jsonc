@@ -1,0 +1,37 @@
+{
+  "name": "NotificationPreference",
+  "type": "object",
+  "properties": {
+    "medication_reminders": {
+      "type": "boolean",
+      "default": true,
+      "description": "Ativar lembretes de medicamentos"
+    },
+    "appointment_reminders": {
+      "type": "boolean",
+      "default": true,
+      "description": "Ativar lembretes de consultas m\u00e9dicas"
+    },
+    "test_reminders": {
+      "type": "boolean",
+      "default": true,
+      "description": "Ativar lembretes de exames"
+    },
+    "meditation_reminders": {
+      "type": "boolean",
+      "default": false,
+      "description": "Ativar lembretes de medita\u00e7\u00e3o"
+    },
+    "task_reminders": {
+      "type": "boolean",
+      "default": true,
+      "description": "Ativar lembretes de tarefas vencidas"
+    },
+    "medication_advance_minutes": {
+      "type": "number",
+      "default": 10,
+      "description": "Minutos de anteced\u00eancia para medicamentos (10, 30 ou 60)"
+    }
+  },
+  "required": []
+}
