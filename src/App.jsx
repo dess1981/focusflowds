@@ -21,6 +21,7 @@ import AIAssistant from './pages/AIAssistant';
 import Calendar from './pages/Calendar';
 import Templates from './pages/Templates';
 import Reports from './pages/Reports';
+import MonthlyDashboard from './pages/MonthlyDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -65,6 +66,7 @@ const AuthenticatedApp = () => {
           <Route path="/assistant" element={<AIAssistant />} />
           <Route path="/templates" element={<Templates />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/monthly" element={<MonthlyDashboard />} />
         </Route>
       </Route>
 

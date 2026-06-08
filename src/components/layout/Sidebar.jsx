@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, CalendarDays, ListTodo, FolderKanban, 
   Clock, Settings, ChevronLeft, ChevronRight, Plus, 
-  Sparkles, Tag, X, Calendar, LayoutTemplate, BarChart3
+  Sparkles, Tag, X, Calendar, LayoutTemplate, BarChart3, TrendingUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +17,7 @@ const navItems = [
   { path: '/categories', icon: Tag, label: 'Categorias' },
   { path: '/templates', icon: LayoutTemplate, label: 'Templates' },
   { path: '/reports', icon: BarChart3, label: 'Relatórios' },
+  { path: '/monthly', icon: TrendingUp, label: 'Análise Mensal' },
   { path: '/assistant', icon: Sparkles, label: 'Assistente IA' },
 ];
 
