@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Plus, Tag, Trash2 } from 'lucide-react';
+import { Plus, Tag, Trash2, Pencil } from 'lucide-react';
 import { motion } from 'framer-motion';
+import TaskListDrawer from '@/components/tasks/TaskListDrawer';
 
 const COLORS = ['#4F6BED', '#2ECC94', '#F4A940', '#FF6B6B', '#9B59B6', '#1ABC9C', '#E74C3C', '#3498DB'];
 
@@ -15,6 +16,7 @@ export default function Categories() {
   const [showForm, setShowForm] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
   const [form, setForm] = useState({ name: '', color: '#4F6BED' });
+  const [drawerCategory, setDrawerCategory] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: categories = [] } = useQuery({
@@ -82,7 +84,7 @@ export default function Categories() {
             >
               <Card
                 className="cursor-pointer hover:shadow-md transition-all group relative"
-                onClick={() => openForm(cat)}
+                onClick={() => setDrawerCategory(cat)}
               >
                 <CardContent className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: cat.color + '20' }}>
@@ -92,12 +94,20 @@ export default function Categories() {
                     <p className="font-medium text-sm">{cat.name}</p>
                     <p className="text-xs text-muted-foreground">{count} tarefa{count !== 1 ? 's' : ''}</p>
                   </div>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(cat.id); }}
-                    className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-destructive transition-all"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openForm(cat); }}
+                      className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(cat.id); }}
+                      className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -111,6 +121,15 @@ export default function Categories() {
           <p className="text-muted-foreground">Nenhuma categoria criada</p>
         </div>
       )}
+
+      <TaskListDrawer
+        open={!!drawerCategory}
+        onOpenChange={(v) => !v && setDrawerCategory(null)}
+        title={drawerCategory?.name || ''}
+        color={drawerCategory?.color}
+        tasks={tasks.filter(t => t.category_id === drawerCategory?.id)}
+        onEdit={() => { openForm(drawerCategory); setDrawerCategory(null); }}
+      />
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent>

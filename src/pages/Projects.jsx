@@ -9,9 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, FolderKanban, Trash2 } from 'lucide-react';
+import { Plus, FolderKanban, Trash2, Pencil } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import TaskListDrawer from '@/components/tasks/TaskListDrawer';
 
 const COLORS = ['#4F6BED', '#2ECC94', '#F4A940', '#FF6B6B', '#9B59B6', '#1ABC9C', '#E74C3C', '#3498DB'];
 
@@ -26,6 +26,7 @@ export default function Projects() {
   const [showForm, setShowForm] = useState(false);
   const [editProject, setEditProject] = useState(null);
   const [form, setForm] = useState({ name: '', description: '', color: '#4F6BED', status: 'active' });
+  const [drawerProject, setDrawerProject] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: projects = [] } = useQuery({
@@ -97,7 +98,7 @@ export default function Projects() {
             >
               <Card
                 className="cursor-pointer hover:shadow-md transition-all group relative overflow-hidden"
-                onClick={() => openForm(project)}
+                onClick={() => setDrawerProject(project)}
               >
                 <div className="h-1.5 w-full" style={{ backgroundColor: project.color || '#4F6BED' }} />
                 <CardContent className="p-5">
@@ -126,12 +127,20 @@ export default function Projects() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(project.id); }}
-                    className="absolute top-3 right-3 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-destructive transition-all"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openForm(project); }}
+                      className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(project.id); }}
+                      className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -145,6 +154,15 @@ export default function Projects() {
           </div>
         )}
       </div>
+
+      <TaskListDrawer
+        open={!!drawerProject}
+        onOpenChange={(v) => !v && setDrawerProject(null)}
+        title={drawerProject?.name || ''}
+        color={drawerProject?.color}
+        tasks={tasks.filter(t => t.project_id === drawerProject?.id)}
+        onEdit={() => { openForm(drawerProject); setDrawerProject(null); }}
+      />
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent>
