@@ -13,12 +13,12 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const timeSlots = [
-  { start: '06:00', end: '09:00', label: 'Manhã Cedo', icon: Sunrise, accent: 'rgba(251,191,36,0.15)', border: 'rgba(251,191,36,0.2)', iconColor: '#fbbf24' },
-  { start: '09:00', end: '12:00', label: 'Manhã', icon: Sun, accent: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.2)', iconColor: '#f97316' },
-  { start: '12:00', end: '14:00', label: 'Almoço', icon: Sun, accent: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.2)', iconColor: '#22c55e' },
-  { start: '14:00', end: '18:00', label: 'Tarde', icon: Sun, accent: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.2)', iconColor: '#3b82f6' },
-  { start: '18:00', end: '21:00', label: 'Noite', icon: Moon, accent: 'rgba(168,85,247,0.12)', border: 'rgba(168,85,247,0.2)', iconColor: '#a855f7' },
-  { start: '21:00', end: '23:59', label: 'Noite Tarde', icon: Moon, accent: 'rgba(99,102,241,0.12)', border: 'rgba(99,102,241,0.2)', iconColor: '#6366f1' },
+  { start: '06:00', end: '09:00', label: 'Manhã Cedo', icon: Sunrise, accent: 'rgba(255,255,255,0.02)', border: 'rgba(251,191,36,0.25)', iconColor: '#fbbf24' },
+  { start: '09:00', end: '12:00', label: 'Manhã', icon: Sun, accent: 'rgba(255,255,255,0.02)', border: 'rgba(249,115,22,0.25)', iconColor: '#f97316' },
+  { start: '12:00', end: '14:00', label: 'Almoço', icon: Sun, accent: 'rgba(255,255,255,0.02)', border: 'rgba(34,197,94,0.25)', iconColor: '#22c55e' },
+  { start: '14:00', end: '18:00', label: 'Tarde', icon: Sun, accent: 'rgba(255,255,255,0.02)', border: 'rgba(59,130,246,0.25)', iconColor: '#3b82f6' },
+  { start: '18:00', end: '21:00', label: 'Noite', icon: Moon, accent: 'rgba(255,255,255,0.02)', border: 'rgba(168,85,247,0.25)', iconColor: '#a855f7' },
+  { start: '21:00', end: '23:59', label: 'Noite Tarde', icon: Moon, accent: 'rgba(255,255,255,0.02)', border: 'rgba(99,102,241,0.25)', iconColor: '#6366f1' },
 ];
 
 function getSlotForTask(task) {
@@ -211,78 +211,101 @@ export default function DailyPlanner() {
         )}
       </div>
 
-      {/* Time Slots */}
-      <div className="space-y-3">
-        {timeSlots.map((slot, idx) => {
-          const slotTasks = scheduledTasks.filter(t => getSlotForTask(t) === idx);
-          const Icon = slot.icon;
+      {/* Timeline */}
+      <div className="relative">
+        {/* Vertical line */}
+        <div className="absolute left-[15px] top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/40 to-accent/20" />
+        
+        <div className="space-y-4">
+          {timeSlots.map((slot, idx) => {
+            const slotTasks = scheduledTasks.filter(t => getSlotForTask(t) === idx);
+            const Icon = slot.icon;
 
-          return (
-            <motion.div
-              key={slot.label}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-              className="rounded-2xl p-4"
-              style={{
-                background: slot.accent,
-                backdropFilter: 'blur(12px)',
-                border: `1px solid ${slot.border}`,
-              }}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <Icon className="w-4 h-4" style={{ color: slot.iconColor }} />
-                <span className="text-sm font-semibold text-white/90">{slot.label}</span>
-                <span className="text-xs ml-auto font-mono" style={{ color: 'rgba(255,255,255,0.35)' }}>{slot.start} – {slot.end}</span>
-              </div>
-
-              {slotTasks.length > 0 ? (
-                <div className="space-y-2">
-                  {slotTasks.map(task => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      compact
-                      onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
-                      onClick={() => { setEditTask(task); setShowForm(true); }}
-                      onRefresh={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}
-                    />
-                  ))}
+            return (
+              <motion.div
+                key={slot.label}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                className="relative pl-12"
+              >
+                {/* Timeline dot */}
+                <div className="absolute left-0 top-1.5 w-8 h-8 rounded-full flex items-center justify-center" 
+                  style={{ background: 'rgba(255,255,255,0.05)', border: `2px solid ${slot.border}` }}>
+                  <Icon className="w-3.5 h-3.5" style={{ color: slot.iconColor }} />
                 </div>
-              ) : (
-                <p className="text-xs italic py-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Nenhuma tarefa agendada</p>
-              )}
-            </motion.div>
-          );
-        })}
+
+                {/* Time slot container */}
+                <div
+                  className="rounded-xl p-3 border"
+                  style={{
+                    background: slotTasks.length > 0 ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${slot.border}`,
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold uppercase tracking-wide" style={{ color: slot.iconColor }}>{slot.label}</span>
+                    <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.4)' }}>{slot.start}</span>
+                  </div>
+
+                  {slotTasks.length > 0 ? (
+                    <div className="space-y-1.5">
+                      {slotTasks.map(task => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          compact
+                          onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
+                          onClick={() => { setEditTask(task); setShowForm(true); }}
+                          onRefresh={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs py-1" style={{ color: 'rgba(255,255,255,0.2)' }}>—</p>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Unscheduled Tasks */}
       {unscheduledTasks.length > 0 && (
-        <div
-          className="rounded-2xl p-4"
-          style={{
-            background: 'rgba(255,255,255,0.04)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
-          <h3 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            📋 Sem horário definido
-            <span className="px-1.5 py-0.5 rounded-full text-xs" style={{ background: 'rgba(168,85,247,0.2)', color: '#a855f7' }}>
-              {unscheduledTasks.length}
-            </span>
-          </h3>
-          <div className="space-y-2">
-            {unscheduledTasks.map(task => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
-                onClick={() => { setEditTask(task); setShowForm(true); }}
-                onRefresh={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}
-              />
-            ))}
+        <div className="relative mt-8">
+          <div className="absolute left-[15px] top-0 bottom-0 w-0.5 bg-gradient-to-b from-muted/30 to-transparent" />
+          <div className="pl-12">
+            <div className="absolute left-0 top-1 w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '2px solid rgba(255,255,255,0.15)' }}>
+              <span className="text-xs">+</span>
+            </div>
+            <div
+              className="rounded-xl p-3 border"
+              style={{
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.1)',
+              }}
+            >
+              <h3 className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                Sem horário
+                <span className="ml-1.5 px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(168,85,247,0.2)', color: '#a855f7' }}>
+                  {unscheduledTasks.length}
+                </span>
+              </h3>
+              <div className="space-y-1.5">
+                {unscheduledTasks.map(task => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    compact
+                    onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
+                    onClick={() => { setEditTask(task); setShowForm(true); }}
+                    onRefresh={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
