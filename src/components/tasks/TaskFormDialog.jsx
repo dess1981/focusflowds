@@ -42,10 +42,15 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
     queryFn: () => base44.entities.Project.list(),
   });
 
-  const { data: activityBlocks = [] } = useQuery({
+  const { data: allTimeBlocks = [] } = useQuery({
     queryKey: ['timeblocks-all'],
     queryFn: () => base44.entities.TimeBlock.list('-created_date', 200),
   });
+
+  // Show only templates + blocks scheduled for the selected due_date
+  const activityBlocks = allTimeBlocks.filter(b =>
+    b.is_template || (form.due_date && b.date === form.due_date)
+  );
 
   useEffect(() => {
     if (task) {
@@ -184,7 +189,9 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
               </Select>
               {activityBlocks.length === 0 && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  Nenhum bloco criado ainda. Crie blocos na página "Blocos de Tempo".
+                  {form.due_date
+                    ? 'Nenhum bloco de atividade ou bloco agendado para esta data.'
+                    : 'Selecione uma data para ver os blocos disponíveis.'}
                 </p>
               )}
             </div>
