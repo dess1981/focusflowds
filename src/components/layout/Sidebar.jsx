@@ -3,12 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, CalendarDays, ListTodo, FolderKanban, 
   Clock, Settings, ChevronLeft, ChevronRight, Plus, 
-  Sparkles, Tag, X, Calendar, LayoutTemplate, BarChart3, TrendingUp
+  Sparkles, Tag, X, Calendar, LayoutTemplate, BarChart3, TrendingUp, CheckCircle2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { path: '/', icon: CalendarDays, label: 'Planner Diário' },
+  { path: '/daily-list', icon: CheckCircle2, label: 'Lista de Hoje' },
   { path: '/calendar', icon: Calendar, label: 'Calendário' },
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/tasks', icon: ListTodo, label: 'Tarefas' },
