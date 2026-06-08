@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
   X, Play, CheckCircle2, Clock, AlertCircle, 
-  Search, Eye, EyeOff, ChevronRight, Sparkles
+  Search, Eye, EyeOff, ChevronRight
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
