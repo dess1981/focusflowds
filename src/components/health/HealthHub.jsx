@@ -34,9 +34,9 @@ export default function HealthHub() {
   const medTakenToday = medLogs.filter(log => log.taken).length;
 
   const tabs = [
-    { value: 'diary', label: 'Diário', icon: BookOpen },
-    { value: 'today', label: 'Hoje', icon: Pill },
-    { value: 'manage', label: 'Medicação', icon: Pill },
+    { value: 'diary', label: 'Emocional', icon: BookOpen },
+    { value: 'today', label: 'Medicação Hoje', icon: Pill },
+    { value: 'manage', label: 'Meus Medicamentos', icon: Pill },
     { value: 'appointments', label: 'Consultas', icon: Calendar },
     { value: 'tests', label: 'Exames', icon: Microscope },
     { value: 'meditate', label: 'Meditação', icon: Wind },
