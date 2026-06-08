@@ -4,10 +4,14 @@ import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
 import MedicationReminders from '@/components/health/MedicationReminders';
 import GlobalSearch from '@/components/GlobalSearch';
+import FocusModeModal from '@/components/focus/FocusModeModal';
 import { useSmartNotifications } from '@/hooks/useSmartNotifications';
+import { useFocusMode } from '@/context/FocusModeContext';
 
 export default function AppLayout() {
   useSmartNotifications();
+  const { focusTaskId, exitFocusMode } = useFocusMode();
+
   return (
     <div className="min-h-screen">
       <Sidebar />
@@ -19,6 +23,7 @@ export default function AppLayout() {
       <BottomNav />
       <MedicationReminders />
       <GlobalSearch />
+      <FocusModeModal taskId={focusTaskId} onExit={exitFocusMode} isActive={!!focusTaskId} />
     </div>
   );
 }

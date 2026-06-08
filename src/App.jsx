@@ -9,6 +9,7 @@ import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import AppLayout from '@/components/layout/AppLayout';
 import { FocusTimerProvider } from '@/context/FocusTimerContext';
+import { FocusModeProvider } from '@/context/FocusModeContext';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -88,11 +89,13 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <FocusTimerProvider>
-          <Router>
-            <ScrollToTop />
-            <AuthenticatedApp />
-          </Router>
-          <Toaster />
+          <FocusModeProvider>
+            <Router>
+              <ScrollToTop />
+              <AuthenticatedApp />
+            </Router>
+            <Toaster />
+          </FocusModeProvider>
         </FocusTimerProvider>
       </QueryClientProvider>
     </AuthProvider>

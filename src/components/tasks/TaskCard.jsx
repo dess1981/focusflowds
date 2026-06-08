@@ -1,11 +1,12 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Clock, Calendar, ChevronRight, Video, CheckSquare, MapPin, Play, Timer } from 'lucide-react';
+import { Clock, Calendar, ChevronRight, Video, CheckSquare, MapPin, Play, Timer, Focus } from 'lucide-react';
 import PriorityBadge from './PriorityBadge';
 import StatusBadge from './StatusBadge';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useFocusTimer } from '@/context/FocusTimerContext';
+import { useFocusMode } from '@/context/FocusModeContext';
 
 const energyIcons = {
   high: '⚡',
@@ -24,6 +25,7 @@ function formatFocusTime(seconds) {
 
 export default function TaskCard({ task, onStatusChange, onClick, onRefresh, compact = false, parentTask = null }) {
   const { startFocus, activeTask } = useFocusTimer();
+  const { startFocusMode } = useFocusMode();
   const isActive = activeTask?.id === task.id;
 
   const nextStatus = {
@@ -157,34 +159,52 @@ export default function TaskCard({ task, onStatusChange, onClick, onRefresh, com
         )}
       </div>
 
-      {/* Right side: focus button + chevron */}
+      {/* Right side: focus buttons + chevron */}
       <div className="flex flex-col items-end gap-1.5">
         {task.status !== 'done' && task.status !== 'cancelled' && (
-          <button
-            onClick={e => {
-              e.stopPropagation();
-              startFocus(task, onRefresh);
-            }}
-            title="Iniciar foco"
-            className={cn(
-              "flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition-all",
-              isActive
-                ? "opacity-100"
-                : "opacity-0 group-hover:opacity-100"
-            )}
-            style={isActive ? {
-              background: 'rgba(168,85,247,0.25)',
-              border: '1px solid rgba(168,85,247,0.5)',
-              color: '#a855f7',
-            } : {
-              background: 'rgba(168,85,247,0.12)',
-              border: '1px solid rgba(168,85,247,0.25)',
-              color: '#a855f7',
-            }}
-          >
-            {isActive ? <Timer className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-            {isActive ? 'Ativo' : 'Focar'}
-          </button>
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={e => {
+                e.stopPropagation();
+                startFocus(task, onRefresh);
+              }}
+              title="Iniciar foco com timer"
+              className={cn(
+                "flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition-all",
+                isActive
+                  ? "opacity-100"
+                  : "opacity-0 group-hover:opacity-100"
+              )}
+              style={isActive ? {
+                background: 'rgba(168,85,247,0.25)',
+                border: '1px solid rgba(168,85,247,0.5)',
+                color: '#a855f7',
+              } : {
+                background: 'rgba(168,85,247,0.12)',
+                border: '1px solid rgba(168,85,247,0.25)',
+                color: '#a855f7',
+              }}
+            >
+              {isActive ? <Timer className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+              {isActive ? 'Ativo' : 'Focar'}
+            </button>
+            
+            <button
+              onClick={e => {
+                e.stopPropagation();
+                startFocusMode(task.id);
+              }}
+              title="Modo de foco fullscreen"
+              className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold"
+              style={{
+                background: 'rgba(59,130,246,0.12)',
+                border: '1px solid rgba(59,130,246,0.25)',
+                color: '#3b82f6',
+              }}
+            >
+              <Focus className="w-3 h-3" />
+            </button>
+          </div>
         )}
 
         {/* Focus time badge */}
