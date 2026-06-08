@@ -8,11 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
-import { RefreshCw, Clock, Video, ExternalLink, Copy, CheckSquare, GitBranch, MapPin, AlertCircle } from 'lucide-react';
+import { RefreshCw, Clock, Video, ExternalLink, Copy, CheckSquare, GitBranch, MapPin, AlertCircle, HardDrive } from 'lucide-react';
 import ChecklistEditor from './ChecklistEditor';
 import SubtasksEditor from './SubtasksEditor';
 import InPersonEventSection from './InPersonEventSection';
 import MeetInviteSection from './MeetInviteSection';
+import DriveFilesSection from './DriveFilesSection';
 
 const WEEK_DAYS = [
   { label: 'Dom', value: 0 },
@@ -32,7 +33,7 @@ const defaultTask = {
   due_date: '', time_block_start: '', time_block_end: '',
   estimated_minutes: '', energy_level: 'medium', category_id: '',
   project_id: '', recurrence: 'none', recurrence_days: [], recurrence_end_date: '', parent_task_id: '',
-  activity_block_id: '', checklist: [],
+  activity_block_id: '', checklist: [], drive_file_urls: [],
 };
 
 function generateMeetLink() {
@@ -416,6 +417,18 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
                 />
               </div>
             )}
+          </div>
+
+          {/* Google Drive Files */}
+          <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/30">
+            <div className="flex items-center gap-2">
+              <HardDrive className="w-4 h-4 text-muted-foreground" />
+              <Label className="text-sm font-semibold">Documentos do Google Drive</Label>
+            </div>
+            <DriveFilesSection
+              links={form.drive_file_urls || []}
+              onChange={items => set('drive_file_urls', items)}
+            />
           </div>
 
           {/* Checklist */}

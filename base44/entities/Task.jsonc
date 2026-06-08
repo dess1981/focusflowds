@@ -147,13 +147,6 @@
       "default": "medium",
       "description": "N\u00edvel de energia necess\u00e1rio (\u00fatil para TDAH)"
     },
-    "drive_file_urls": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "URLs de arquivos do Google Drive"
-    },
     "calendar_event_id": {
       "type": "string",
       "description": "ID do evento no Google Calendar"
@@ -173,6 +166,27 @@
           "done": {
             "type": "boolean",
             "default": false
+          }
+        }
+      }
+    },
+    "drive_file_urls": {
+      "type": "array",
+      "description": "Documentos vinculados do Google Drive",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
           }
         }
       }
