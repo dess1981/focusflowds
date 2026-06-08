@@ -16,7 +16,8 @@
         "todo",
         "in_progress",
         "done",
-        "cancelled"
+        "cancelled",
+        "delegado"
       ],
       "default": "todo"
     },
@@ -219,6 +220,50 @@
       "type": "number",
       "description": "Total de segundos de foco acumulados",
       "default": 0
+    },
+    "comments": {
+      "type": "array",
+      "description": "Coment\u00e1rios e feedback da tarefa",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "delegated_to": {
+      "type": "string",
+      "description": "Email da pessoa para quem foi delegada"
+    },
+    "delegated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data em que foi delegada"
+    },
+    "delegation_token": {
+      "type": "string",
+      "description": "Token \u00fanico para rastrear resposta da delega\u00e7\u00e3o"
+    },
+    "has_followup_task": {
+      "type": "boolean",
+      "default": false,
+      "description": "Se tem tarefa de acompanhamento"
+    },
+    "followup_task_id": {
+      "type": "string",
+      "description": "ID da tarefa de acompanhamento"
     }
   },
   "required": [

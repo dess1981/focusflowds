@@ -16,6 +16,9 @@ import MeetInviteSection from './MeetInviteSection';
 import DriveFilesSection from './DriveFilesSection';
 import DriveFileSelector from './DriveFileSelector';
 import UseTemplateButton from './UseTemplateButton';
+import TaskComments from './TaskComments';
+import DelegateTaskDialog from './DelegateTaskDialog';
+import { Mail } from 'lucide-react';
 
 const WEEK_DAYS = [
   { label: 'Dom', value: 0 },
@@ -46,6 +49,7 @@ function generateMeetLink() {
 
 export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
   const [form, setForm] = useState(defaultTask);
+  const [delegateOpen, setDelegateOpen] = useState(false);
   const isEdit = !!task?.id;
 
   // Meeting is "complete" when it has date + start time
@@ -452,6 +456,22 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
             />
           </div>
 
+          {/* Comments */}
+          {isEdit && (
+            <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/30">
+              <TaskComments
+                comments={task?.comments || []}
+                onAddComment={async (text) => {
+                  await base44.functions.invoke('addTaskComment', {
+                    taskId: task.id,
+                    text
+                  });
+                  onSave?.();
+                }}
+              />
+            </div>
+          )}
+
           {/* Subtasks */}
           {isEdit && (
             <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/30">
@@ -470,11 +490,29 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
         </div>
 
         <DialogFooter>
+          {isEdit && task?.status !== 'done' && (
+            <Button 
+              variant="outline" 
+              onClick={() => setDelegateOpen(true)}
+              className="mr-auto"
+            >
+              <Mail className="w-4 h-4 mr-2" />
+              Delegar
+            </Button>
+          )}
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
           <Button onClick={handleSave} disabled={!form.title.trim()}>
             {isEdit ? 'Salvar' : 'Criar Tarefa'}
           </Button>
         </DialogFooter>
+
+        {isEdit && (
+          <DelegateTaskDialog
+            isOpen={delegateOpen}
+            onClose={() => setDelegateOpen(false)}
+            task={task}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
