@@ -1,19 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Filter, X, Play, CheckCircle2, Clock, AlertCircle, 
-  Search, Eye, EyeOff, ChevronRight, Calendar
+  X, Play, CheckCircle2, Clock, AlertCircle, 
+  Search, Eye, EyeOff, ChevronRight, Sparkles
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFocusTimer } from '@/context/FocusTimerContext';
-import DailyDiaryPanel from '@/components/health/DailyDiaryPanel';
+import HomeStats from '@/components/home/HomeStats';
+import EmailsSummary from '@/components/home/EmailsSummary';
 
 const priorityConfig = {
   urgent: { label: '🔴 Urgente', color: '#ef4444', sortOrder: 0 },
@@ -97,65 +97,52 @@ export default function DailyTaskList() {
   const getCategoryName = (catId) => categories.find(c => c.id === catId)?.name || 'Sem categoria';
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-heading font-bold tracking-tight">Tarefas de Hoje</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {format(new Date(), 'EEEE, d MMMM', { locale: ptBR })}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {stats.urgentCount > 0 && (
-            <Badge variant="destructive" className="gap-1">
-              <AlertCircle className="w-3 h-3" />
-              {stats.urgentCount} urgente{stats.urgentCount > 1 ? 's' : ''}
-            </Badge>
-          )}
-        </div>
+      <div>
+        <h1
+          className="text-3xl font-heading font-bold tracking-tight text-white"
+          style={{ textShadow: '0 0 30px rgba(168,85,247,0.4)' }}
+        >
+          Bom dia! 👋
+        </h1>
+        <p className="text-sm mt-1 capitalize" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          {format(new Date(), 'EEEE, d MMMM', { locale: ptBR })}
+        </p>
       </div>
 
-      {/* Stats Cards */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-2 sm:grid-cols-4 gap-3"
-      >
-        <div className="glass-card rounded-xl p-3">
-          <p className="text-xs text-muted-foreground mb-1">Total</p>
-          <p className="text-xl font-bold">{stats.total}</p>
-        </div>
-        <div className="glass-card rounded-xl p-3">
-          <p className="text-xs text-muted-foreground mb-1">A Fazer</p>
-          <p className="text-xl font-bold text-blue-400">{stats.todo}</p>
-        </div>
-        <div className="glass-card rounded-xl p-3">
-          <p className="text-xs text-muted-foreground mb-1">Em Progresso</p>
-          <p className="text-xl font-bold text-yellow-400">{stats.inProgress}</p>
-        </div>
-        <div className="glass-card rounded-xl p-3">
-          <p className="text-xs text-muted-foreground mb-1">Concluídas</p>
-          <p className="text-xl font-bold text-green-400">{stats.done}</p>
-        </div>
-      </motion.div>
+      {/* Stats Overview */}
+      <HomeStats stats={stats} />
 
-      {/* Search */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative"
-      >
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar tarefas..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          className="pl-9"
-        />
-      </motion.div>
+      {/* Email Summary + Search */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Emails */}
+        <div className="lg:col-span-1">
+          <EmailsSummary />
+        </div>
 
-      {/* Filters */}
+        {/* Search */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="lg:col-span-2 relative"
+        >
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'rgba(255,255,255,0.35)' }} />
+          <input
+            type="text"
+            placeholder="Buscar tarefas..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="w-full h-10 pl-9 pr-4 rounded-xl text-sm outline-none text-white placeholder:text-white/30 transition-all"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: searchTerm ? '1px solid rgba(168,85,247,0.45)' : '1px solid rgba(255,255,255,0.1)',
+            }}
+          />
+        </motion.div>
+      </div>
+
+      {/* Filters Section */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -163,17 +150,17 @@ export default function DailyTaskList() {
       >
         {/* Priority filter */}
         <div className="space-y-2">
-          <p className="text-xs font-semibold text-muted-foreground">Prioridade</p>
+          <p className="text-xs font-semibold text-white/60 uppercase tracking-wide">Prioridade</p>
           <div className="flex flex-wrap gap-2">
             {Object.entries(priorityConfig).map(([key, config]) => (
               <button
                 key={key}
                 onClick={() => togglePriority(key)}
                 className={cn(
-                  "px-3 py-1.5 rounded-lg text-sm font-medium transition-all border",
+                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
                   selectedPriorities.includes(key)
                     ? "border-current text-white"
-                    : "border-border bg-muted/30 text-muted-foreground hover:border-current/50"
+                    : "border-white/10 bg-white/5 text-white/60 hover:border-white/20"
                 )}
                 style={selectedPriorities.includes(key) ? {
                   background: `${config.color}20`,
@@ -190,17 +177,17 @@ export default function DailyTaskList() {
         {/* Category filter */}
         {categories.length > 0 && (
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground">Categorias</p>
+            <p className="text-xs font-semibold text-white/60 uppercase tracking-wide">Categorias</p>
             <div className="flex flex-wrap gap-2">
               {categories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => toggleCategory(cat.id)}
                   className={cn(
-                    "px-3 py-1.5 rounded-lg text-sm font-medium transition-all border",
+                    "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
                     selectedCategories.includes(cat.id)
                       ? "border-current text-white"
-                      : "border-border bg-muted/30 text-muted-foreground hover:border-primary/50"
+                      : "border-white/10 bg-white/5 text-white/60 hover:border-white/20"
                   )}
                   style={selectedCategories.includes(cat.id) ? {
                     background: `${cat.color}20`,
@@ -219,7 +206,7 @@ export default function DailyTaskList() {
         <div className="flex gap-2 pt-1">
           <button
             onClick={() => setHideCompleted(!hideCompleted)}
-            className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg hover:bg-muted/30 transition-colors"
+            className="flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg transition-colors text-white/60 hover:text-white/90 hover:bg-white/5"
           >
             {hideCompleted ? (
               <><Eye className="w-3 h-3" /> Mostrar Concluídas</>
@@ -230,7 +217,7 @@ export default function DailyTaskList() {
           {(searchTerm || selectedCategories.length > 0 || selectedPriorities.length < 4) && (
             <button
               onClick={resetFilters}
-              className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg hover:bg-muted/30 transition-colors"
+              className="flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg transition-colors text-white/60 hover:text-white/90 hover:bg-white/5"
             >
               <X className="w-3 h-3" /> Limpar
             </button>
@@ -238,15 +225,20 @@ export default function DailyTaskList() {
         </div>
       </motion.div>
 
-      {/* Daily Diary */}
+      {/* Task list */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
+        className="space-y-3"
       >
-        <DailyDiaryPanel />
+        {filteredTasks.length > 0 && (
+          <h2 className="text-sm font-bold uppercase tracking-wide text-white/60">
+            Tarefas de Hoje
+          </h2>
+        )}
       </motion.div>
 
-      {/* Task list */}
+      {/* Task list content */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
