@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { BookOpen, Save } from 'lucide-react';
 import { format } from 'date-fns';
+import DiaryAIInsights from './DiaryAIInsights';
 
 const moods = ['😍', '😊', '😐', '😔', '😢'];
 
@@ -128,7 +129,9 @@ export default function DailyDiaryPanel() {
           {entry?.mood && <span className="text-2xl">{entry.mood}</span>}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
+        <DiaryAIInsights />
+
         {entry ? (
           <>
             {entry.diary_text && (
