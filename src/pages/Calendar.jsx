@@ -286,25 +286,25 @@ export default function Calendar() {
                     return (
                       <Draggable key={task.id} draggableId={`task-${task.id}`} index={taskIdx}>
                         {(dragProvided, dragSnapshot) => (
-                      <div
-                        ref={dragProvided.innerRef}
-                        {...dragProvided.draggableProps}
-                        {...dragProvided.dragHandleProps}
-                        className={cn(
-                          "flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs truncate font-medium transition-all backdrop-blur-sm",
-                          dragSnapshot.isDragging && "opacity-50 scale-95",
-                          task.status === 'done' ? "bg-muted/40 text-muted-foreground line-through" : "cursor-move hover:shadow-md"
-                        )}
-                        style={task.status === 'done' ? {} : {
-                          backgroundColor: taskStyle.bgLight,
-                          color: taskStyle.bgColor,
-                          border: `1px solid ${taskStyle.border}`,
-                          boxShadow: `0 4px 12px ${taskStyle.bgColor}10`
-                        }}
-                      >
-                        <div className={cn("w-2 h-2 rounded-full flex-shrink-0", priorityColors[task.priority] || 'bg-slate-500')} style={task.status === 'done' ? {} : { backgroundColor: taskStyle.bgColor }} />
-                        <span className="truncate">{task.title}</span>
-                      </div>
+                          <div
+                            ref={dragProvided.innerRef}
+                            {...dragProvided.draggableProps}
+                            {...dragProvided.dragHandleProps}
+                            className={cn(
+                              "flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs truncate font-medium transition-all backdrop-blur-sm",
+                              dragSnapshot.isDragging && "opacity-50 scale-95",
+                              task.status === 'done' ? "bg-muted/40 text-muted-foreground line-through" : "cursor-move hover:shadow-md"
+                            )}
+                            style={task.status === 'done' ? {} : {
+                              backgroundColor: taskStyle.bgLight,
+                              color: taskStyle.bgColor,
+                              border: `1px solid ${taskStyle.border}`,
+                              boxShadow: `0 4px 12px ${taskStyle.bgColor}10`
+                            }}
+                          >
+                            <div className={cn("w-2 h-2 rounded-full flex-shrink-0", priorityColors[task.priority] || 'bg-slate-500')} style={task.status === 'done' ? {} : { backgroundColor: taskStyle.bgColor }} />
+                            <span className="truncate">{task.title}</span>
+                          </div>
                         )}
                       </Draggable>
                     );
