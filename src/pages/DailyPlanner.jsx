@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { ChevronLeft, ChevronRight, Plus, CalendarDays, Sun, Sunrise, Moon, Sparkles, Search, X } from 'lucide-react';
 import TaskCard from '@/components/tasks/TaskCard';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
+import SmartNotifications from '@/components/SmartNotifications';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -176,6 +177,9 @@ export default function DailyPlanner() {
           </button>
         )}
       </div>
+
+      {/* Smart Notifications — only on today's view */}
+      {isToday(selectedDate) && <SmartNotifications />}
 
       {/* Progress Bar */}
       <div
