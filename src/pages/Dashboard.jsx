@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import PriorityBadge from '@/components/tasks/PriorityBadge';
 import CategoryGoalBar from '@/components/categories/CategoryGoalBar';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import WeeklySummaryModal from '@/components/insights/WeeklySummaryModal';
 
 const COLORS = ['#4F6BED', '#2ECC94', '#F4A940', '#FF6B6B', '#9B59B6'];
 
@@ -38,6 +39,8 @@ function StatCard({ title, value, subtitle, icon: Icon, color }) {
 }
 
 export default function Dashboard() {
+  const [summaryOpen, setSummaryOpen] = useState(false);
+
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks'],
     queryFn: () => base44.entities.Task.list('-created_date', 500),
@@ -154,7 +157,9 @@ export default function Dashboard() {
         <StatCard title="Hoje" value={`${stats.todayCompleted}/${stats.todayTotal}`} subtitle="tarefas concluídas" icon={CalendarDays} color="bg-primary" />
         <StatCard title="Em Progresso" value={stats.inProgress} subtitle="tarefas ativas" icon={Clock} color="bg-amber-500" />
         <StatCard title="Atrasadas" value={stats.overdue} subtitle="precisam de atenção" icon={AlertTriangle} color="bg-red-500" />
-        <StatCard title="Sequência" value={`${stats.streak}🔥`} subtitle="dias consecutivos" icon={Flame} color="bg-green-500" />
+        <button onClick={() => setSummaryOpen(true)} className="group">
+          <StatCard title="Sequência" value={`${stats.streak}🔥`} subtitle="clique para resumo" icon={Flame} color="bg-green-500" />
+        </button>
       </div>
 
       {/* Charts Row */}
@@ -292,6 +297,11 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <WeeklySummaryModal
+        open={summaryOpen}
+        onOpenChange={setSummaryOpen}
+      />
     </div>
   );
 }
