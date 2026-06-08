@@ -71,6 +71,12 @@ export default function Tasks() {
     return map;
   }, [projects]);
 
+  const taskMap = useMemo(() => {
+    const map = {};
+    tasks.forEach(t => { map[t.id] = t; });
+    return map;
+  }, [tasks]);
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -193,6 +199,7 @@ export default function Tasks() {
               >
                 <TaskCard
                   task={task}
+                  parentTask={task.parent_task_id ? taskMap[task.parent_task_id] : null}
                   onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
                   onClick={() => { setEditTask(task); setShowForm(true); }}
                   onRefresh={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}

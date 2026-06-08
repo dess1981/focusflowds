@@ -22,7 +22,7 @@ function formatFocusTime(seconds) {
   return `${seconds}s de foco`;
 }
 
-export default function TaskCard({ task, onStatusChange, onClick, onRefresh, compact = false }) {
+export default function TaskCard({ task, onStatusChange, onClick, onRefresh, compact = false, parentTask = null }) {
   const { startFocus, activeTask } = useFocusTimer();
   const isActive = activeTask?.id === task.id;
 
@@ -64,12 +64,19 @@ export default function TaskCard({ task, onStatusChange, onClick, onRefresh, com
       />
 
       <div className="flex-1 min-w-0">
-        <p className={cn(
-          "text-sm font-medium truncate text-white/90",
-          task.status === 'done' && "line-through text-white/40"
-        )}>
-          {task.title}
-        </p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className={cn(
+            "text-sm font-medium truncate text-white/90",
+            task.status === 'done' && "line-through text-white/40"
+          )}>
+            {task.title}
+          </p>
+          {task.parent_task_id && parentTask && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30 whitespace-nowrap flex-shrink-0">
+              📌 {parentTask.title}
+            </span>
+          )}
+        </div>
 
         <div className="flex items-center gap-3 mt-1.5 flex-wrap">
           <PriorityBadge priority={task.priority} />
