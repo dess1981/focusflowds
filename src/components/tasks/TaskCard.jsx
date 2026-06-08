@@ -207,18 +207,18 @@ export default function TaskCard({ task, onStatusChange, onClick, onRefresh, com
               <Focus className="w-3 h-3" />
             </button>
           </div>
-        )}
+      )}
 
-        {/* Focus time badge */}
-        {task.total_focus_seconds > 0 && (
-          <span className="text-[10px] flex items-center gap-0.5" style={{ color: 'rgba(168,85,247,0.6)' }}>
-            <Timer className="w-2.5 h-2.5" />
-            {formatFocusTime(task.total_focus_seconds)}
-          </span>
-        )}
+      {/* Focus time badge */}
+      {task.total_focus_seconds > 0 && (
+        <span className="text-[10px] flex items-center gap-0.5" style={{ color: 'rgba(168,85,247,0.6)' }}>
+          <Timer className="w-2.5 h-2.5" />
+          {formatFocusTime(task.total_focus_seconds)}
+        </span>
+      )}
 
-        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity mt-0.5" />
-      </div>
+      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity mt-0.5" />
+    </div>
     </div>
   );
 }
