@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, CalendarDays, ListTodo, FolderKanban, 
   Clock, Settings, ChevronLeft, ChevronRight, Plus, 
-  Sparkles, Tag, X, Calendar, LayoutTemplate, BarChart3, TrendingUp, CheckCircle2
+  Sparkles, Tag, X, Calendar, LayoutTemplate, BarChart3, TrendingUp, CheckCircle2, Heart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +28,7 @@ const navSections = [
   {
     title: 'Saúde',
     items: [
-      { path: '/health', icon: '💚', label: 'Saúde & Bem-estar' },
+      { path: '/health', icon: Heart, label: 'Saúde & Bem-estar' },
     ],
   },
   {
