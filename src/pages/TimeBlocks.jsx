@@ -7,11 +7,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Clock, ChevronLeft, ChevronRight, Trash2, RefreshCw, Layers, Calendar } from 'lucide-react';
+import { Plus, Clock, ChevronLeft, ChevronRight, Trash2, RefreshCw, Layers, Calendar, BarChart3 } from 'lucide-react';
 import { format, addDays, subDays, isToday, addWeeks, addMonths, parseISO, isBefore, isAfter, getDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import TimeBlocksCalendar from '@/components/timeblocks/TimeBlocksCalendar';
+import TimeBlocksAnalytics from '@/components/timeblocks/TimeBlocksAnalytics';
 
 const typeConfig = {
   task: { label: 'Tarefa', color: 'bg-blue-100 text-blue-700 border-blue-200', hex: '#3B82F6' },
@@ -80,6 +82,7 @@ export default function TimeBlocks() {
   const [editBlock, setEditBlock] = useState(null);
   const [form, setForm] = useState(defaultForm);
   const [deleteScope, setDeleteScope] = useState(null);
+  const [activeTab, setActiveTab] = useState('list');
   const queryClient = useQueryClient();
   const dateStr = format(selectedDate, 'yyyy-MM-dd');
 
@@ -277,7 +280,45 @@ export default function TimeBlocks() {
             📅 Organize seu dia com blocos de atividade
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Abas */}
+          <div className="flex items-center border border-border rounded-lg p-1 bg-muted/50">
+            <button
+              onClick={() => setActiveTab('list')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                activeTab === 'list'
+                  ? 'bg-background shadow-sm text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              Timeline
+            </button>
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                activeTab === 'calendar'
+                  ? 'bg-background shadow-sm text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              Calendário
+            </button>
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                activeTab === 'analytics'
+                  ? 'bg-background shadow-sm text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              Análise
+            </button>
+          </div>
+
+          {/* Navegação de data */}
           <Button variant="outline" size="icon" onClick={() => setSelectedDate(d => subDays(d, 1))}>
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -298,8 +339,25 @@ export default function TimeBlocks() {
         {format(selectedDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
       </p>
 
-      {/* Dashboard de Equilíbrio */}
-      {dayBlocks.length > 0 && dayStats.totalMinutes > 0 && (
+      {/* Conteúdo por Aba */}
+      {activeTab === 'calendar' && (
+        <TimeBlocksCalendar
+          blocks={blocks}
+          selectedDate={selectedDate}
+          onDateClick={setSelectedDate}
+          onPrevMonth={() => setSelectedDate(d => subDays(d, 30))}
+          onNextMonth={() => setSelectedDate(d => addDays(d, 30))}
+        />
+      )}
+
+      {activeTab === 'analytics' && (
+        <TimeBlocksAnalytics blocks={blocks} selectedDate={selectedDate} />
+      )}
+
+      {activeTab === 'list' && (
+        <>
+          {/* Dashboard de Equilíbrio */}
+          {dayBlocks.length > 0 && dayStats.totalMinutes > 0 && (
         <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/30">
           <CardContent className="p-6">
             <h3 className="font-semibold text-sm mb-4">Equilíbrio do Dia</h3>
@@ -362,8 +420,8 @@ export default function TimeBlocks() {
         </Card>
       )}
 
-      {/* Timeline de Blocos */}
-      <div className="space-y-2">
+          {/* Timeline de Blocos */}
+          <div className="space-y-2">
         {dayBlocks.map((block, i) => {
           const config = typeConfig[block.type] || typeConfig.task;
           const duration = block.start_time && block.end_time ? getDuration(block.start_time, block.end_time) : null;
@@ -416,17 +474,19 @@ export default function TimeBlocks() {
           );
         })}
 
-        {dayBlocks.length === 0 && (
-          <div className="text-center py-16">
-            <Clock className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
-            <p className="text-muted-foreground">Nenhum bloco de tempo para este dia</p>
-            <Button className="mt-4" variant="outline" onClick={() => openForm(null)}>
-              <Plus className="w-4 h-4 mr-1.5" />
-              Criar Bloco
-            </Button>
+            {dayBlocks.length === 0 && (
+              <div className="text-center py-16">
+                <Clock className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
+                <p className="text-muted-foreground">Nenhum bloco de tempo para este dia</p>
+                <Button className="mt-4" variant="outline" onClick={() => openForm(null)}>
+                  <Plus className="w-4 h-4 mr-1.5" />
+                  Criar Bloco
+                </Button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       {/* Create/Edit Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
