@@ -10,6 +10,8 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import DailyDiaryPanel from './DailyDiaryPanel';
 import MedicationTracker from './MedicationTracker';
+import MedicationManager from './MedicationManager';
+import MedicationHistoryPanel from './MedicationHistoryPanel';
 import MeditationHub from './MeditationHub';
 import TdahResources from './TdahResources';
 
@@ -40,12 +42,13 @@ export default function HealthHub() {
       </div>
 
       <Tabs defaultValue="diary" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="diary" className="text-xs">📔 Diário</TabsTrigger>
-          <TabsTrigger value="meds" className="text-xs flex items-center gap-1">
+          <TabsTrigger value="today" className="text-xs flex items-center gap-1">
             <Pill className="w-3 h-3" />
-            Med
+            Hoje
           </TabsTrigger>
+          <TabsTrigger value="manage" className="text-xs">⚙️ Meds</TabsTrigger>
           <TabsTrigger value="meditate" className="text-xs">🧘 Meditar</TabsTrigger>
           <TabsTrigger value="learn" className="text-xs">📚 TDAH</TabsTrigger>
         </TabsList>
@@ -54,8 +57,13 @@ export default function HealthHub() {
           <DailyDiaryPanel />
         </TabsContent>
 
-        <TabsContent value="meds" className="mt-3">
+        <TabsContent value="today" className="mt-3 space-y-3">
           <MedicationTracker medications={medications} medLogs={medLogs} medTakenToday={medTakenToday} />
+          <MedicationHistoryPanel />
+        </TabsContent>
+
+        <TabsContent value="manage" className="mt-3 space-y-3">
+          <MedicationManager />
         </TabsContent>
 
         <TabsContent value="meditate" className="mt-3">
