@@ -1,14 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, LayoutList, Kanban } from 'lucide-react';
+import { Plus, Search, LayoutList, Kanban, Timer, ChevronDown, ChevronUp } from 'lucide-react';
 import TaskCard from '@/components/tasks/TaskCard';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import KanbanBoard from '@/components/tasks/KanbanBoard';
 import { AnimatePresence, motion } from 'framer-motion';
+import FocusStatsPanel from '@/components/focus/FocusStatsPanel';
 
 export default function Tasks() {
   const [showForm, setShowForm] = useState(false);
@@ -17,6 +18,7 @@ export default function Tasks() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [view, setView] = useState('list');
+  const [showStats, setShowStats] = useState(false);
   const queryClient = useQueryClient();
 
   // Check for ?new=true
@@ -76,6 +78,20 @@ export default function Tasks() {
           <p className="text-muted-foreground text-sm mt-0.5">{filtered.length} tarefa{filtered.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="flex items-center gap-2">
+          {/* Focus stats toggle */}
+          <button
+            onClick={() => setShowStats(s => !s)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+            style={{
+              background: showStats ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.05)',
+              border: showStats ? '1px solid rgba(168,85,247,0.4)' : '1px solid rgba(255,255,255,0.1)',
+              color: showStats ? '#a855f7' : 'rgba(255,255,255,0.5)',
+            }}
+          >
+            <Timer className="w-3.5 h-3.5" />
+            Foco
+            {showStats ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
           {/* View Toggle */}
           <div className="flex items-center border border-border rounded-lg p-1 bg-muted/50">
             <button
@@ -97,6 +113,28 @@ export default function Tasks() {
           </Button>
         </div>
       </div>
+
+      {/* Focus Stats Panel */}
+      <AnimatePresence>
+        {showStats && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div
+              className="rounded-xl p-4 mb-1"
+              style={{ background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.2)' }}
+            >
+              <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#a855f7' }}>
+                ⚡ Seu histórico de foco
+              </p>
+              <FocusStatsPanel tasks={tasks} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -153,6 +191,7 @@ export default function Tasks() {
                   task={task}
                   onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
                   onClick={() => { setEditTask(task); setShowForm(true); }}
+                  onRefresh={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}
                 />
               </motion.div>
             ))}

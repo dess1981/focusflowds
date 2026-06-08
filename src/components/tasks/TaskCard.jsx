@@ -1,10 +1,11 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Clock, Calendar, ChevronRight, Video, CheckSquare, GitBranch, MapPin, Navigation } from 'lucide-react';
+import { Clock, Calendar, ChevronRight, Video, CheckSquare, MapPin, Play, Timer } from 'lucide-react';
 import PriorityBadge from './PriorityBadge';
 import StatusBadge from './StatusBadge';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useFocusTimer } from '@/context/FocusTimerContext';
 
 const energyIcons = {
   high: '⚡',
@@ -12,7 +13,19 @@ const energyIcons = {
   low: '🌿',
 };
 
-export default function TaskCard({ task, onStatusChange, onClick, compact = false }) {
+function formatFocusTime(seconds) {
+  if (!seconds) return null;
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}min de foco`;
+  if (m > 0) return `${m}min de foco`;
+  return `${seconds}s de foco`;
+}
+
+export default function TaskCard({ task, onStatusChange, onClick, onRefresh, compact = false }) {
+  const { startFocus, activeTask } = useFocusTimer();
+  const isActive = activeTask?.id === task.id;
+
   const nextStatus = {
     todo: 'in_progress',
     in_progress: 'done',
@@ -137,7 +150,46 @@ export default function TaskCard({ task, onStatusChange, onClick, compact = fals
         )}
       </div>
 
-      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity mt-1" />
+      {/* Right side: focus button + chevron */}
+      <div className="flex flex-col items-end gap-1.5">
+        {task.status !== 'done' && task.status !== 'cancelled' && (
+          <button
+            onClick={e => {
+              e.stopPropagation();
+              startFocus(task, onRefresh);
+            }}
+            title="Iniciar foco"
+            className={cn(
+              "flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition-all",
+              isActive
+                ? "opacity-100"
+                : "opacity-0 group-hover:opacity-100"
+            )}
+            style={isActive ? {
+              background: 'rgba(168,85,247,0.25)',
+              border: '1px solid rgba(168,85,247,0.5)',
+              color: '#a855f7',
+            } : {
+              background: 'rgba(168,85,247,0.12)',
+              border: '1px solid rgba(168,85,247,0.25)',
+              color: '#a855f7',
+            }}
+          >
+            {isActive ? <Timer className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+            {isActive ? 'Ativo' : 'Focar'}
+          </button>
+        )}
+
+        {/* Focus time badge */}
+        {task.total_focus_seconds > 0 && (
+          <span className="text-[10px] flex items-center gap-0.5" style={{ color: 'rgba(168,85,247,0.6)' }}>
+            <Timer className="w-2.5 h-2.5" />
+            {formatFocusTime(task.total_focus_seconds)}
+          </span>
+        )}
+
+        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity mt-0.5" />
+      </div>
     </div>
   );
 }

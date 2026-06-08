@@ -245,6 +245,7 @@ export default function DailyPlanner() {
                       compact
                       onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
                       onClick={() => { setEditTask(task); setShowForm(true); }}
+                      onRefresh={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}
                     />
                   ))}
                 </div>
@@ -279,6 +280,7 @@ export default function DailyPlanner() {
                 task={task}
                 onStatusChange={(t, s) => updateStatus.mutate({ task: t, status: s })}
                 onClick={() => { setEditTask(task); setShowForm(true); }}
+                onRefresh={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}
               />
             ))}
           </div>
