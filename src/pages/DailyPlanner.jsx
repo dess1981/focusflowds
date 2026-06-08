@@ -11,12 +11,12 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const timeSlots = [
-  { start: '06:00', end: '09:00', label: 'Manhã Cedo', icon: Sunrise, color: 'from-amber-50 to-orange-50 border-amber-200' },
-  { start: '09:00', end: '12:00', label: 'Manhã', icon: Sun, color: 'from-yellow-50 to-amber-50 border-yellow-200' },
-  { start: '12:00', end: '14:00', label: 'Almoço', icon: Sun, color: 'from-green-50 to-emerald-50 border-green-200' },
-  { start: '14:00', end: '18:00', label: 'Tarde', icon: Sun, color: 'from-blue-50 to-sky-50 border-blue-200' },
-  { start: '18:00', end: '21:00', label: 'Noite', icon: Moon, color: 'from-indigo-50 to-purple-50 border-indigo-200' },
-  { start: '21:00', end: '23:59', label: 'Noite Tarde', icon: Moon, color: 'from-purple-50 to-slate-50 border-purple-200' },
+  { start: '06:00', end: '09:00', label: 'Manhã Cedo', icon: Sunrise, accent: 'rgba(251,191,36,0.15)', border: 'rgba(251,191,36,0.2)', iconColor: '#fbbf24' },
+  { start: '09:00', end: '12:00', label: 'Manhã', icon: Sun, accent: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.2)', iconColor: '#f97316' },
+  { start: '12:00', end: '14:00', label: 'Almoço', icon: Sun, accent: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.2)', iconColor: '#22c55e' },
+  { start: '14:00', end: '18:00', label: 'Tarde', icon: Sun, accent: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.2)', iconColor: '#3b82f6' },
+  { start: '18:00', end: '21:00', label: 'Noite', icon: Moon, accent: 'rgba(168,85,247,0.12)', border: 'rgba(168,85,247,0.2)', iconColor: '#a855f7' },
+  { start: '21:00', end: '23:59', label: 'Noite Tarde', icon: Moon, accent: 'rgba(99,102,241,0.12)', border: 'rgba(99,102,241,0.2)', iconColor: '#6366f1' },
 ];
 
 function getSlotForTask(task) {
@@ -75,52 +75,87 @@ export default function DailyPlanner() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-heading font-bold tracking-tight">
+          <h1
+            className="text-2xl font-heading font-bold tracking-tight text-white"
+            style={{ textShadow: '0 0 30px rgba(168,85,247,0.4)' }}
+          >
             {isToday(selectedDate) ? 'Hoje' : format(selectedDate, "EEEE", { locale: ptBR })}
           </h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
+          <p className="text-sm mt-0.5 capitalize" style={{ color: 'rgba(255,255,255,0.4)' }}>
             {format(selectedDate, "d 'de' MMMM, yyyy", { locale: ptBR })}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => setSelectedDate(d => subDays(d, 1))}>
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant={isToday(selectedDate) ? "default" : "outline"} 
-            size="sm"
-            onClick={() => setSelectedDate(new Date())}
+          <button
+            onClick={() => setSelectedDate(d => subDays(d, 1))}
+            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
           >
-            <CalendarDays className="w-4 h-4 mr-1.5" />
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setSelectedDate(new Date())}
+            className="px-3 h-9 rounded-xl text-sm font-medium flex items-center gap-1.5 transition-all"
+            style={isToday(selectedDate) ? {
+              background: 'linear-gradient(135deg, rgba(168,85,247,0.3), rgba(34,211,238,0.15))',
+              border: '1px solid rgba(168,85,247,0.4)',
+              color: '#a855f7',
+            } : {
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: 'rgba(255,255,255,0.7)',
+            }}
+          >
+            <CalendarDays className="w-4 h-4" />
             Hoje
-          </Button>
-          <Button variant="outline" size="icon" onClick={() => setSelectedDate(d => addDays(d, 1))}>
+          </button>
+          <button
+            onClick={() => setSelectedDate(d => addDays(d, 1))}
+            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
+          >
             <ChevronRight className="w-4 h-4" />
-          </Button>
-          <Button onClick={() => { setEditTask(null); setShowForm(true); }} className="ml-2">
-            <Plus className="w-4 h-4 mr-1.5" />
+          </button>
+          <button
+            onClick={() => { setEditTask(null); setShowForm(true); }}
+            className="ml-1 px-4 h-9 rounded-xl text-sm font-semibold text-white flex items-center gap-1.5 transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #a855f7, #3b82f6)',
+              boxShadow: '0 4px 20px rgba(168,85,247,0.35)',
+            }}
+          >
+            <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Nova Tarefa</span>
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-card rounded-2xl border border-border p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium">Progresso do Dia</span>
-          <span className="text-sm text-muted-foreground">{completedCount}/{totalCount} tarefas</span>
+      <div
+        className="rounded-2xl p-4"
+        style={{
+          background: 'rgba(255,255,255,0.04)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(168,85,247,0.2)',
+          boxShadow: '0 0 30px rgba(168,85,247,0.06)',
+        }}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-semibold text-white/90">Progresso do Dia</span>
+          <span className="text-sm font-mono" style={{ color: '#a855f7' }}>{completedCount}/{totalCount} tarefas</span>
         </div>
-        <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
           <motion.div
-            className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full"
+            className="h-full rounded-full"
+            style={{ background: 'linear-gradient(90deg, #a855f7, #22d3ee)' }}
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
           />
         </div>
         {progress === 100 && totalCount > 0 && (
-          <p className="text-sm text-green-600 font-medium mt-2 flex items-center gap-1">
+          <p className="text-sm font-medium mt-2 flex items-center gap-1" style={{ color: '#22d3ee' }}>
             <Sparkles className="w-4 h-4" /> Parabéns! Todas as tarefas concluídas! 🎉
           </p>
         )}
@@ -138,15 +173,17 @@ export default function DailyPlanner() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
-              className={cn(
-                "rounded-2xl border p-4 bg-gradient-to-r",
-                slot.color
-              )}
+              className="rounded-2xl p-4"
+              style={{
+                background: slot.accent,
+                backdropFilter: 'blur(12px)',
+                border: `1px solid ${slot.border}`,
+              }}
             >
               <div className="flex items-center gap-2 mb-3">
-                <Icon className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-semibold">{slot.label}</span>
-                <span className="text-xs text-muted-foreground">{slot.start} - {slot.end}</span>
+                <Icon className="w-4 h-4" style={{ color: slot.iconColor }} />
+                <span className="text-sm font-semibold text-white/90">{slot.label}</span>
+                <span className="text-xs ml-auto font-mono" style={{ color: 'rgba(255,255,255,0.35)' }}>{slot.start} – {slot.end}</span>
               </div>
 
               {slotTasks.length > 0 ? (
@@ -162,7 +199,7 @@ export default function DailyPlanner() {
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground italic py-1">Nenhuma tarefa agendada</p>
+                <p className="text-xs italic py-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Nenhuma tarefa agendada</p>
               )}
             </motion.div>
           );
@@ -171,9 +208,19 @@ export default function DailyPlanner() {
 
       {/* Unscheduled Tasks */}
       {unscheduledTasks.length > 0 && (
-        <div className="bg-card rounded-2xl border border-border p-4">
-          <h3 className="text-sm font-semibold mb-3 text-muted-foreground">
-            📋 Sem horário definido ({unscheduledTasks.length})
+        <div
+          className="rounded-2xl p-4"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          <h3 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            📋 Sem horário definido
+            <span className="px-1.5 py-0.5 rounded-full text-xs" style={{ background: 'rgba(168,85,247,0.2)', color: '#a855f7' }}>
+              {unscheduledTasks.length}
+            </span>
           </h3>
           <div className="space-y-2">
             {unscheduledTasks.map(task => (
@@ -190,13 +237,25 @@ export default function DailyPlanner() {
 
       {!isLoading && todayTasks.length === 0 && (
         <div className="text-center py-16">
-          <CalendarDays className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
-          <h3 className="font-heading font-semibold text-lg">Dia livre!</h3>
-          <p className="text-muted-foreground text-sm mt-1">Nenhuma tarefa para este dia. Que tal adicionar uma?</p>
-          <Button className="mt-4" onClick={() => { setEditTask(null); setShowForm(true); }}>
-            <Plus className="w-4 h-4 mr-1.5" />
+          <div
+            className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+            style={{ background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)' }}
+          >
+            <CalendarDays className="w-8 h-8" style={{ color: '#a855f7' }} />
+          </div>
+          <h3 className="font-heading font-semibold text-lg text-white/80">Dia livre!</h3>
+          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>Nenhuma tarefa para este dia. Que tal adicionar uma?</p>
+          <button
+            className="mt-4 px-6 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center gap-2 mx-auto transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #a855f7, #3b82f6)',
+              boxShadow: '0 4px 20px rgba(168,85,247,0.35)',
+            }}
+            onClick={() => { setEditTask(null); setShowForm(true); }}
+          >
+            <Plus className="w-4 h-4" />
             Criar Tarefa
-          </Button>
+          </button>
         </div>
       )}
 

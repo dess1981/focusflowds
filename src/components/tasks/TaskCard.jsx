@@ -24,10 +24,23 @@ export default function TaskCard({ task, onStatusChange, onClick, compact = fals
     <div
       onClick={onClick}
       className={cn(
-        "group flex items-start gap-3 p-3 rounded-xl border border-border bg-card hover:shadow-md hover:border-primary/20 transition-all duration-200 cursor-pointer",
-        task.status === 'done' && "opacity-60",
+        "group flex items-start gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer",
+        task.status === 'done' && "opacity-50",
         compact && "py-2"
       )}
+      style={{
+        background: 'rgba(255,255,255,0.05)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255,255,255,0.09)',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.background = 'rgba(168,85,247,0.1)';
+        e.currentTarget.style.border = '1px solid rgba(168,85,247,0.25)';
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+        e.currentTarget.style.border = '1px solid rgba(255,255,255,0.09)';
+      }}
     >
       <StatusBadge
         status={task.status}
@@ -39,8 +52,8 @@ export default function TaskCard({ task, onStatusChange, onClick, compact = fals
 
       <div className="flex-1 min-w-0">
         <p className={cn(
-          "text-sm font-medium truncate",
-          task.status === 'done' && "line-through text-muted-foreground"
+          "text-sm font-medium truncate text-white/90",
+          task.status === 'done' && "line-through text-white/40"
         )}>
           {task.title}
         </p>
@@ -49,14 +62,14 @@ export default function TaskCard({ task, onStatusChange, onClick, compact = fals
           <PriorityBadge priority={task.priority} />
           
           {task.time_block_start && task.time_block_end && (
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1 text-xs" style={{ color: '#22d3ee' }}>
               <Clock className="w-3 h-3" />
-              {task.time_block_start} - {task.time_block_end}
+              {task.time_block_start} – {task.time_block_end}
             </span>
           )}
 
           {task.due_date && !compact && (
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
               <Calendar className="w-3 h-3" />
               {format(new Date(task.due_date + 'T12:00:00'), 'dd MMM', { locale: ptBR })}
             </span>
@@ -69,7 +82,7 @@ export default function TaskCard({ task, onStatusChange, onClick, compact = fals
           )}
 
           {task.estimated_minutes && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
               {task.estimated_minutes}min
             </span>
           )}
