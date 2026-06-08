@@ -1,0 +1,45 @@
+{
+  "name": "TdahArticle",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo do artigo"
+    },
+    "description": {
+      "type": "string",
+      "description": "Conte\u00fado do artigo"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "B\u00e1sico",
+        "Pr\u00e1tico",
+        "Positivo",
+        "Desafio",
+        "Sa\u00fade",
+        "Emocional",
+        "Relacionamento",
+        "Movimento"
+      ],
+      "description": "Categoria do artigo"
+    },
+    "language": {
+      "type": "string",
+      "default": "pt-BR",
+      "description": "Idioma do artigo"
+    },
+    "source": {
+      "type": "string",
+      "description": "Fonte do conte\u00fado"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u00daltima atualiza\u00e7\u00e3o"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

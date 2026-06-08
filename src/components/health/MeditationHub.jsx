@@ -7,43 +7,16 @@ import { Badge } from '@/components/ui/badge';
 import { Play, CheckCircle2, Brain } from 'lucide-react';
 import { format } from 'date-fns';
 
-const MEDITATION_GUIDES = [
-  {
-    title: 'Foco & Concentração',
-    description: 'Meditação de 5 min para melhorar seu foco',
-    category: 'foco',
-    duration: 5,
-  },
-  {
-    title: 'Calma TDAH',
-    description: 'Técnica rápida para lidar com a agitação mental',
-    category: 'ansiedade',
-    duration: 3,
-  },
-  {
-    title: 'Relaxamento Profundo',
-    description: 'Meditação guiada para relaxamento total',
-    category: 'relaxamento',
-    duration: 10,
-  },
-  {
-    title: 'Sono Tranquilo',
-    description: 'Para uma noite de sono reparador',
-    category: 'sono',
-    duration: 15,
-  },
-  {
-    title: 'Gratidão Matinal',
-    description: 'Inicie o dia com positividade',
-    category: 'gratidão',
-    duration: 5,
-  },
-];
-
 export default function MeditationHub() {
   const [selectedSession, setSelectedSession] = useState(null);
   const queryClient = useQueryClient();
   const today = format(new Date(), 'yyyy-MM-dd');
+
+  // Carregar templates de meditação do banco
+  const { data: meditationTemplates = [] } = useQuery({
+    queryKey: ['meditation-templates'],
+    queryFn: () => base44.entities.MeditationSession.list('-created_date', 50),
+  });
 
   const { data: sessions = [] } = useQuery({
     queryKey: ['meditation-sessions', today],
@@ -61,9 +34,13 @@ export default function MeditationHub() {
   });
 
   const startSessionMutation = useMutation({
-    mutationFn: async (guide) => {
+    mutationFn: async (template) => {
       const session = await base44.entities.MeditationSession.create({
-        ...guide,
+        title: template.title,
+        description: template.description,
+        duration_minutes: template.duration_minutes,
+        category: template.category,
+        difficulty: template.difficulty,
         date: today,
         completed: false,
       });
@@ -139,38 +116,44 @@ export default function MeditationHub() {
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
-        {MEDITATION_GUIDES.map((guide, i) => {
-          const completed = sessions.some(s => s.title === guide.title && s.completed);
-          return (
-            <button
-              key={i}
-              onClick={() => startSessionMutation.mutate(guide)}
-              disabled={startSessionMutation.isPending}
-              className={`w-full p-3 rounded-lg text-left border-2 transition-all ${
-                completed
-                  ? 'bg-green-500/10 border-green-500/30'
-                  : 'bg-muted/30 border-border hover:border-primary/50'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5">
-                  {completed ? (
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
-                  ) : (
-                    <Play className="w-5 h-5 text-primary" />
-                  )}
+        {meditationTemplates.length === 0 ? (
+          <div className="text-center py-6">
+            <p className="text-xs text-muted-foreground">Carregando meditações...</p>
+          </div>
+        ) : (
+          meditationTemplates.map((template, i) => {
+            const completed = sessions.some(s => s.title === template.title && s.completed);
+            return (
+              <button
+                key={template.id || i}
+                onClick={() => startSessionMutation.mutate(template)}
+                disabled={startSessionMutation.isPending}
+                className={`w-full p-3 rounded-lg text-left border-2 transition-all ${
+                  completed
+                    ? 'bg-green-500/10 border-green-500/30'
+                    : 'bg-muted/30 border-border hover:border-primary/50'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    {completed ? (
+                      <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <Play className="w-5 h-5 text-primary" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium ${completed ? 'line-through text-muted-foreground' : ''}`}>
+                      {template.title}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{template.description}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{template.duration_minutes} minutos</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium ${completed ? 'line-through text-muted-foreground' : ''}`}>
-                    {guide.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{guide.description}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{guide.duration} minutos</p>
-                </div>
-              </div>
-            </button>
-          );
-        })}
+              </button>
+            );
+          })
+        )}
       </CardContent>
     </Card>
   );
