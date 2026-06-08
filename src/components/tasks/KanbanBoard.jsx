@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button';
 import TaskCard from './TaskCard';
 
 const COLUMNS = [
-  { id: 'todo', label: 'A Fazer', color: 'bg-slate-100 border-slate-200', dot: 'bg-slate-400' },
-  { id: 'in_progress', label: 'Em Progresso', color: 'bg-blue-50 border-blue-200', dot: 'bg-blue-500' },
-  { id: 'done', label: 'Concluído', color: 'bg-green-50 border-green-200', dot: 'bg-green-500' },
-  { id: 'cancelled', label: 'Cancelado', color: 'bg-red-50 border-red-200', dot: 'bg-red-400' },
+  { id: 'todo', label: 'A Fazer', headerBg: 'bg-slate-900 border-slate-700', dot: 'bg-slate-400', columnBg: 'bg-slate-950 border-slate-800' },
+  { id: 'in_progress', label: 'Em Progresso', headerBg: 'bg-blue-950 border-blue-700', dot: 'bg-blue-400', columnBg: 'bg-blue-950/30 border-blue-800' },
+  { id: 'done', label: 'Concluído', headerBg: 'bg-green-950 border-green-700', dot: 'bg-green-400', columnBg: 'bg-green-950/30 border-green-800' },
+  { id: 'cancelled', label: 'Cancelado', headerBg: 'bg-red-950 border-red-700', dot: 'bg-red-400', columnBg: 'bg-red-950/30 border-red-800' },
 ];
 
 export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onNewTask }) {
@@ -46,11 +46,11 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onNewT
               className="flex-shrink-0 w-[280px] flex flex-col"
             >
               {/* Column header */}
-              <div className={cn('rounded-t-xl border px-3 py-2.5 flex items-center justify-between', col.color)}>
+              <div className={cn('rounded-t-xl border px-3 py-2.5 flex items-center justify-between', col.headerBg)}>
                 <div className="flex items-center gap-2">
                   <div className={cn('w-2 h-2 rounded-full', col.dot)} />
-                  <span className="text-sm font-semibold">{col.label}</span>
-                  <span className="text-xs text-muted-foreground bg-white/60 px-1.5 py-0.5 rounded-full font-medium">
+                  <span className="text-sm font-semibold text-white">{col.label}</span>
+                  <span className="text-xs text-white/60 bg-white/10 px-1.5 py-0.5 rounded-full font-medium">
                     {colTasks.length}
                   </span>
                 </div>
@@ -74,8 +74,8 @@ export default function KanbanBoard({ tasks, onStatusChange, onTaskClick, onNewT
                     {...provided.droppableProps}
                     className={cn(
                       'flex-1 rounded-b-xl border border-t-0 p-2 space-y-2 transition-colors min-h-[120px]',
-                      col.color,
-                      snapshot.isDraggingOver && 'ring-2 ring-primary/30 bg-primary/5'
+                      col.columnBg,
+                      snapshot.isDraggingOver && 'ring-2 ring-primary/50'
                     )}
                   >
                     {colTasks.map((task, index) => (
