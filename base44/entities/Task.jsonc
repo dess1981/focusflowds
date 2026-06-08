@@ -86,6 +86,18 @@
       ],
       "default": "none"
     },
+    "recurrence_days": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Dias da semana para recorr\u00eancia semanal (0=Dom, 1=Seg, ...6=S\u00e1b)"
+    },
+    "recurrence_end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de fim da recorr\u00eancia"
+    },
     "energy_level": {
       "type": "string",
       "enum": [

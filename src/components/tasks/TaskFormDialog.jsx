@@ -7,12 +7,24 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { cn } from '@/lib/utils';
+import { RefreshCw } from 'lucide-react';
+
+const WEEK_DAYS = [
+  { label: 'Dom', value: 0 },
+  { label: 'Seg', value: 1 },
+  { label: 'Ter', value: 2 },
+  { label: 'Qua', value: 3 },
+  { label: 'Qui', value: 4 },
+  { label: 'Sex', value: 5 },
+  { label: 'Sáb', value: 6 },
+];
 
 const defaultTask = {
   title: '', description: '', status: 'todo', priority: 'medium',
   due_date: '', time_block_start: '', time_block_end: '',
   estimated_minutes: '', energy_level: 'medium', category_id: '',
-  project_id: '', recurrence: 'none', parent_task_id: '',
+  project_id: '', recurrence: 'none', recurrence_days: [], recurrence_end_date: '', parent_task_id: '',
 };
 
 export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
@@ -57,6 +69,15 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
   };
 
   const set = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
+
+  const toggleWeekDay = (day) => {
+    setForm(f => ({
+      ...f,
+      recurrence_days: f.recurrence_days?.includes(day)
+        ? f.recurrence_days.filter(d => d !== day)
+        : [...(f.recurrence_days || []), day],
+    }));
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -161,10 +182,13 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
             </div>
           </div>
 
-          <div>
-            <Label>Recorrência</Label>
-            <Select value={form.recurrence} onValueChange={v => set('recurrence', v)}>
-              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+          <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/30">
+            <div className="flex items-center gap-2">
+              <RefreshCw className="w-4 h-4 text-muted-foreground" />
+              <Label className="text-sm font-semibold">Recorrência</Label>
+            </div>
+            <Select value={form.recurrence} onValueChange={v => set('recurrence', v === 'none' ? 'none' : v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Sem recorrência</SelectItem>
                 <SelectItem value="daily">Diária</SelectItem>
@@ -172,6 +196,42 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
                 <SelectItem value="monthly">Mensal</SelectItem>
               </SelectContent>
             </Select>
+
+            {form.recurrence === 'weekly' && (
+              <div>
+                <Label className="text-xs text-muted-foreground mb-2 block">Repetir nos dias</Label>
+                <div className="flex gap-1.5 flex-wrap">
+                  {WEEK_DAYS.map(d => (
+                    <button
+                      key={d.value}
+                      type="button"
+                      onClick={() => toggleWeekDay(d.value)}
+                      className={cn(
+                        "w-9 h-9 rounded-full text-xs font-medium border transition-colors",
+                        form.recurrence_days?.includes(d.value)
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-background border-border hover:border-primary/50"
+                      )}
+                    >
+                      {d.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {form.recurrence !== 'none' && (
+              <div>
+                <Label className="text-xs text-muted-foreground">Repetir até (opcional)</Label>
+                <Input
+                  type="date"
+                  value={form.recurrence_end_date || ''}
+                  onChange={e => set('recurrence_end_date', e.target.value)}
+                  className="mt-1"
+                  min={form.due_date}
+                />
+              </div>
+            )}
           </div>
         </div>
 
