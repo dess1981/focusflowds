@@ -14,11 +14,12 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 const typeConfig = {
-  task: { label: 'Tarefa', color: 'bg-blue-100 text-blue-700 border-blue-200' },
-  break: { label: 'Pausa', color: 'bg-green-100 text-green-700 border-green-200' },
-  focus: { label: 'Foco', color: 'bg-purple-100 text-purple-700 border-purple-200' },
-  meeting: { label: 'Reunião', color: 'bg-amber-100 text-amber-700 border-amber-200' },
-  personal: { label: 'Pessoal', color: 'bg-rose-100 text-rose-700 border-rose-200' },
+  task: { label: 'Tarefa', color: 'bg-blue-100 text-blue-700 border-blue-200', hex: '#3B82F6' },
+  break: { label: 'Pausa', color: 'bg-green-100 text-green-700 border-green-200', hex: '#10B981' },
+  focus: { label: 'Foco', color: 'bg-purple-100 text-purple-700 border-purple-200', hex: '#A855F7' },
+  meeting: { label: 'Reunião', color: 'bg-amber-100 text-amber-700 border-amber-200', hex: '#F59E0B' },
+  personal: { label: 'Pessoal', color: 'bg-rose-100 text-rose-700 border-rose-200', hex: '#F43F5E' },
+  sleep: { label: 'Sono', color: 'bg-indigo-100 text-indigo-700 border-indigo-200', hex: '#6366F1' },
 };
 
 const WEEK_DAYS = [
@@ -78,8 +79,7 @@ export default function TimeBlocks() {
   const [showForm, setShowForm] = useState(false);
   const [editBlock, setEditBlock] = useState(null);
   const [form, setForm] = useState(defaultForm);
-  const [deleteScope, setDeleteScope] = useState(null); // { block, scope: 'one' | 'all' }
-  const [activeTab, setActiveTab] = useState('day'); // 'day' | 'templates'
+  const [deleteScope, setDeleteScope] = useState(null);
   const queryClient = useQueryClient();
   const dateStr = format(selectedDate, 'yyyy-MM-dd');
 
@@ -89,14 +89,33 @@ export default function TimeBlocks() {
   });
 
   const dayBlocks = useMemo(() =>
-    blocks.filter(b => !b.is_template && b.date === dateStr).sort((a, b) => (a.start_time || '').localeCompare(b.start_time || '')),
+    blocks.filter(b => b.date === dateStr).sort((a, b) => (a.start_time || '').localeCompare(b.start_time || '')),
     [blocks, dateStr]
   );
 
-  const templateBlocks = useMemo(() =>
-    blocks.filter(b => b.is_template),
-    [blocks]
-  );
+  // Calcula percentuais por tipo de bloco para o dia
+  const dayStats = useMemo(() => {
+    const stats = {};
+    let totalMinutes = 0;
+
+    dayBlocks.forEach(block => {
+      const type = block.type || 'task';
+      if (!stats[type]) stats[type] = 0;
+      
+      if (block.start_time && block.end_time) {
+        const minutes = getDuration(block.start_time, block.end_time);
+        stats[type] += minutes;
+        totalMinutes += minutes;
+      }
+    });
+
+    const percentages = {};
+    Object.keys(stats).forEach(type => {
+      percentages[type] = totalMinutes > 0 ? Math.round((stats[type] / totalMinutes) * 100) : 0;
+    });
+
+    return { stats, totalMinutes, percentages };
+  }, [dayBlocks]);
 
   const saveMutation = useMutation({
     mutationFn: async (data) => {
@@ -202,7 +221,7 @@ export default function TimeBlocks() {
     },
   });
 
-  const openForm = (block, forceTemplate = false) => {
+  const openForm = (block = null) => {
     if (block) {
       setEditBlock(block);
       setForm({
@@ -219,8 +238,7 @@ export default function TimeBlocks() {
       });
     } else {
       setEditBlock(null);
-      const isTemplate = forceTemplate || activeTab === 'templates';
-      setForm({ ...defaultForm, date: isTemplate ? '' : dateStr, is_template: isTemplate });
+      setForm({ ...defaultForm, date: dateStr });
     }
     setShowForm(true);
   };
@@ -256,163 +274,95 @@ export default function TimeBlocks() {
         <div>
           <h1 className="text-2xl font-heading font-bold tracking-tight">Blocos de Tempo</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            {activeTab === 'day' 
-              ? '📅 Crie blocos para organizar sua agenda' 
-              : '🎨 Crie modelos reutilizáveis (ex: "Financeiro", "Reuniões")'}
+            📅 Organize seu dia com blocos de atividade
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {activeTab === 'day' && (
-            <>
-              <Button variant="outline" size="icon" onClick={() => setSelectedDate(d => subDays(d, 1))}>
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <Button variant={isToday(selectedDate) ? "default" : "outline"} size="sm" onClick={() => setSelectedDate(new Date())}>
-                Hoje
-              </Button>
-              <Button variant="outline" size="icon" onClick={() => setSelectedDate(d => addDays(d, 1))}>
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </>
-          )}
-          <Button className="ml-2" onClick={() => openForm(null)}>
+          <Button variant="outline" size="icon" onClick={() => setSelectedDate(d => subDays(d, 1))}>
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <Button variant={isToday(selectedDate) ? "default" : "outline"} size="sm" onClick={() => setSelectedDate(new Date())}>
+            Hoje
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => setSelectedDate(d => addDays(d, 1))}>
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+          <Button className="ml-2" onClick={() => openForm()}>
             <Plus className="w-4 h-4 mr-1.5" />
-            {activeTab === 'templates' ? 'Novo Bloco de Atividade' : 'Novo Bloco'}
+            Novo Bloco
           </Button>
         </div>
       </div>
 
-      {/* Info Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Card 
-          className={cn(
-            "cursor-pointer transition-all border-2",
-            activeTab === 'day' 
-              ? 'border-primary bg-primary/5' 
-              : 'border-border hover:border-primary/50'
-          )}
-          onClick={() => setActiveTab('day')}
-        >
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <Calendar className="w-5 h-5 text-primary mt-1" />
-              <div>
-                <h3 className="font-semibold text-sm">Plano do Dia</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Blocos agendados para <strong>hoje específico</strong>. Defina data, horário início/fim.
+      <p className="text-sm font-medium text-muted-foreground">
+        {format(selectedDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
+      </p>
+
+      {/* Dashboard de Equilíbrio */}
+      {dayBlocks.length > 0 && dayStats.totalMinutes > 0 && (
+        <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/30">
+          <CardContent className="p-6">
+            <h3 className="font-semibold text-sm mb-4">Equilíbrio do Dia</h3>
+            <div className="space-y-3">
+              {/* Barra visual horizontal */}
+              <div className="flex h-8 rounded-lg overflow-hidden gap-0.5 bg-muted/30">
+                {Object.entries(dayStats.percentages)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([type, percentage]) => {
+                    const config = typeConfig[type];
+                    return percentage > 0 ? (
+                      <div
+                        key={type}
+                        className="flex items-center justify-center text-xs font-semibold text-white transition-all hover:opacity-80"
+                        style={{
+                          width: `${percentage}%`,
+                          backgroundColor: config?.hex,
+                          minWidth: percentage > 5 ? 'auto' : '0',
+                        }}
+                        title={`${config?.label}: ${dayStats.stats[type]} min (${percentage}%)`}
+                      >
+                        {percentage > 8 && <span>{percentage}%</span>}
+                      </div>
+                    ) : null;
+                  })}
+              </div>
+
+              {/* Legenda com minutos */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {Object.entries(dayStats.stats)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([type, minutes]) => {
+                    const config = typeConfig[type];
+                    const hours = Math.floor(minutes / 60);
+                    const mins = minutes % 60;
+                    return (
+                      <div key={type} className="flex items-center gap-2 text-xs">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: config?.hex }} />
+                        <div>
+                          <p className="font-medium">{config?.label}</p>
+                          <p className="text-muted-foreground">
+                            {hours > 0 ? `${hours}h ${mins}m` : `${mins}m`}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              {/* Total do dia */}
+              <div className="text-center pt-2 border-t border-border/50">
+                <p className="text-xs text-muted-foreground">
+                  Total: <span className="font-semibold text-foreground">
+                    {Math.floor(dayStats.totalMinutes / 60)}h {dayStats.totalMinutes % 60}m
+                  </span>
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        <Card 
-          className={cn(
-            "cursor-pointer transition-all border-2",
-            activeTab === 'templates' 
-              ? 'border-primary bg-primary/5' 
-              : 'border-border hover:border-primary/50'
-          )}
-          onClick={() => setActiveTab('templates')}
-        >
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <Layers className="w-5 h-5 text-primary mt-1" />
-              <div>
-                <h3 className="font-semibold text-sm">Modelos (Templates)</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Crie categorias <strong>reutilizáveis</strong> sem data/horário (ex: "Financeiro").
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-1 bg-muted/50 p-1 rounded-xl w-fit">
-        <button
-          onClick={() => setActiveTab('day')}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-            activeTab === 'day' ? "bg-card shadow text-foreground" : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <Calendar className="w-4 h-4" />
-          Plano do Dia
-        </button>
-        <button
-          onClick={() => setActiveTab('templates')}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-            activeTab === 'templates' ? "bg-card shadow text-foreground" : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <Layers className="w-4 h-4" />
-          Modelos
-          {templateBlocks.length > 0 && (
-            <span className="bg-primary/10 text-primary text-xs px-1.5 rounded-full">{templateBlocks.length}</span>
-          )}
-        </button>
-      </div>
-
-      {activeTab === 'day' && (
-        <p className="text-sm font-medium text-muted-foreground">
-          {format(selectedDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
-        </p>
       )}
 
-      {/* Activity Templates Tab */}
-      {activeTab === 'templates' && (
-        <div className="space-y-2">
-          {templateBlocks.map((block, i) => {
-            const config = typeConfig[block.type] || typeConfig.task;
-            return (
-              <motion.div key={block.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
-                <Card className="cursor-pointer hover:shadow-md transition-all group relative overflow-hidden" onClick={() => openForm(block)}>
-                  <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: block.color || '#4F6BED' }} />
-                  <CardContent className="p-4 pl-5 flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${block.color || '#4F6BED'}20` }}>
-                      <Layers className="w-4 h-4" style={{ color: block.color || '#4F6BED' }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{block.title}</p>
-                      <span className={cn("text-xs px-2 py-0.5 rounded-full border", config.color)}>{config.label}</span>
-                    </div>
-                    <button
-                      onClick={(e) => handleDelete(e, block)}
-                      className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-destructive transition-all"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            );
-          })}
-          {templateBlocks.length === 0 && (
-            <div className="text-center py-16 border border-dashed border-border rounded-xl bg-muted/30">
-              <Layers className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
-              <p className="text-muted-foreground font-medium">Nenhum modelo criado</p>
-              <p className="text-sm text-muted-foreground/70 mt-2 max-w-md mx-auto">
-                💡 Modelos são <strong>categorias reutilizáveis</strong>. Use para organizar tipos de tarefas:
-              </p>
-              <div className="text-sm text-muted-foreground/70 mt-3 space-y-1">
-                <p>📚 Estudo</p>
-                <p>💼 Financeiro</p>
-                <p>👥 Reuniões</p>
-              </div>
-              <Button className="mt-6" onClick={() => openForm(null, true)}>
-                <Plus className="w-4 h-4 mr-1.5" />
-                Criar Primeiro Modelo
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Day Timeline Tab */}
-      {activeTab === 'day' && (
+      {/* Timeline de Blocos */}
       <div className="space-y-2">
         {dayBlocks.map((block, i) => {
           const config = typeConfig[block.type] || typeConfig.task;
@@ -477,24 +427,19 @@ export default function TimeBlocks() {
           </div>
         )}
       </div>
-      )}
 
       {/* Create/Edit Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editBlock
-                ? (editBlock.is_template ? 'Editar Bloco de Atividade' : 'Editar Bloco')
-                : form.is_template && form.recurrence !== 'none'
-                  ? 'Novo Bloco Recorrente'
-                  : (form.is_template ? 'Novo Bloco de Atividade' : 'Novo Bloco de Tempo')}
+              {editBlock ? 'Editar Bloco' : 'Novo Bloco de Tempo'}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
               <Label>Título *</Label>
-              <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder={form.is_template ? 'Ex: Financeiro, Reuniões, Estudo...' : 'O que você vai fazer?'} className="mt-1" />
+              <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder='O que você vai fazer?' className="mt-1" />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -508,6 +453,7 @@ export default function TimeBlocks() {
                     <SelectItem value="meeting">📅 Reunião</SelectItem>
                     <SelectItem value="break">☕ Pausa</SelectItem>
                     <SelectItem value="personal">🏠 Pessoal</SelectItem>
+                    <SelectItem value="sleep">😴 Sono</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -525,36 +471,27 @@ export default function TimeBlocks() {
               </div>
             </div>
 
-            {/* Time fields for both day blocks and recurring templates */}
-            {(!form.is_template || (form.is_template && form.recurrence !== 'none')) && (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label>Início (opcional)</Label>
-                    <Input type="time" value={form.start_time} onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))} className="mt-1" />
-                  </div>
-                  <div>
-                    <Label>Fim (opcional)</Label>
-                    <Input type="time" value={form.end_time} onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))} className="mt-1" />
-                  </div>
-                </div>
-                {!form.is_template && (
-                  <div>
-                    <Label>Data *</Label>
-                    <Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} className="mt-1" />
-                  </div>
-                )}
-              </>
-            )}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Início *</Label>
+                <Input type="time" value={form.start_time} onChange={e => setForm(f => ({ ...f, start_time: e.target.value }))} className="mt-1" />
+              </div>
+              <div>
+                <Label>Fim *</Label>
+                <Input type="time" value={form.end_time} onChange={e => setForm(f => ({ ...f, end_time: e.target.value }))} className="mt-1" />
+              </div>
+            </div>
+            <div>
+              <Label>Data *</Label>
+              <Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} className="mt-1" />
+            </div>
 
-            {/* Recurrence section — for both day blocks and recurring templates */}
-            {!editBlock && (!form.is_template || (form.is_template && form.recurrence !== 'none')) && (
+            {/* Recurrence section */}
+            {!editBlock && (
               <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/30">
                 <div className="flex items-center gap-2">
                   <RefreshCw className="w-4 h-4 text-muted-foreground" />
-                  <Label className="text-sm font-semibold">
-                    {form.is_template ? 'Aplicar em Dias Específicos' : 'Recorrência'}
-                  </Label>
+                  <Label className="text-sm font-semibold">Recorrência</Label>
                 </div>
                 <Select value={form.recurrence} onValueChange={v => setForm(f => ({ ...f, recurrence: v, recurrence_days: [] }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -611,12 +548,10 @@ export default function TimeBlocks() {
             <Button variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
             <Button
               onClick={() => saveMutation.mutate(form)}
-              disabled={!form.title.trim() || (form.is_template && form.recurrence !== 'none' && form.recurrence_days.length === 0 && form.recurrence !== 'daily' && form.recurrence !== 'monthly') || saveMutation.isPending}
+              disabled={!form.title.trim() || !form.start_time || !form.end_time || !form.date || saveMutation.isPending}
             >
               {saveMutation.isPending ? 'Salvando...'
                 : editBlock ? 'Salvar'
-                : form.is_template && form.recurrence !== 'none' ? 'Criar Blocos Recorrentes'
-                : form.is_template ? 'Criar Modelo'
                 : form.recurrence !== 'none' ? 'Criar Série'
                 : 'Criar Bloco'}
             </Button>
