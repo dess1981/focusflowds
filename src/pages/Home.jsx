@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import DailyTaskList from '@/pages/DailyTaskList';
+import DailyTasksWidget from '@/components/home/DailyTasksWidget';
 import { Send, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -99,7 +99,7 @@ export default function Home() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Main Content - Tasks */}
       <div className="lg:col-span-2">
-        <DailyTaskList />
+        <DailyTasksWidget />
       </div>
 
       {/* Sidebar - AI Assistant */}
