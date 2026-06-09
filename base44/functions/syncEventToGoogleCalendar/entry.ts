@@ -7,14 +7,24 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
-    if (!user) {
+    // For frontend calls, require authentication
+    const body = await req.json();
+    const { entityType, entity, action } = body;
+
+    // Automation calls may not have a user context — that's allowed
+    if (!user && !body.event) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { entityType, entity, action } = await req.json();
-
-    // Get Google Calendar connection
-    const { accessToken } = await base44.asServiceRole.connectors.getCurrentAppUserConnection(CONNECTOR_ID);
+    // Get Google Calendar connection — skip gracefully if not connected
+    let accessToken;
+    try {
+      const conn = await base44.asServiceRole.connectors.getCurrentAppUserConnection(CONNECTOR_ID);
+      accessToken = conn.accessToken;
+    } catch (connErr) {
+      console.warn('Google Calendar not connected, skipping sync:', connErr.message);
+      return Response.json({ success: true, skipped: true, reason: 'no_connection' });
+    }
 
     // For Tasks and TimeBlocks
     const isTask = entityType === 'Task';
@@ -26,7 +36,7 @@ Deno.serve(async (req) => {
 
     // Handle delete
     if (action === 'delete' && entity.calendar_event_id) {
-      const deleteRes = await fetch(
+      const deleteRes = await fetchWithRetry(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events/${entity.calendar_event_id}`,
         {
           method: 'DELETE',
@@ -34,8 +44,8 @@ Deno.serve(async (req) => {
         }
       );
 
-      if (!deleteRes.ok && deleteRes.status !== 404) {
-        console.error('Failed to delete calendar event');
+      if (!deleteRes.ok && deleteRes.status !== 404 && deleteRes.status !== 410) {
+        console.error('Failed to delete calendar event, status:', deleteRes.status);
       }
 
       return Response.json({ success: true, action: 'deleted' });
@@ -84,7 +94,7 @@ Deno.serve(async (req) => {
       ? `https://www.googleapis.com/calendar/v3/calendars/primary/events/${entity.calendar_event_id}`
       : 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
 
-    const response = await fetch(eventUrl, {
+    const response = await fetchWithRetry(eventUrl, {
       method,
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -148,6 +158,21 @@ function buildDescription(entity, entityType) {
     return entity.type ? `Bloco de atividade: ${entity.type}` : 'Bloco de atividade';
   }
   return '';
+}
+
+async function fetchWithRetry(url, options, maxRetries = 3) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const res = await fetch(url, options);
+    if (res.status === 429 || res.status === 503) {
+      const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
+      console.warn(`Rate limited (attempt ${attempt + 1}), retrying in ${Math.round(delay)}ms`);
+      await new Promise(r => setTimeout(r, delay));
+      continue;
+    }
+    return res;
+  }
+  // Final attempt
+  return fetch(url, options);
 }
 
 function mapColorToGoogleColorId(hexColor) {
