@@ -7,7 +7,7 @@ import TaskFormDialog from './TaskFormDialog.jsx';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 
-export default function TaskListDrawer({ open, onOpenChange, title, color, tasks, timeBlocks = [], onEdit, defaultDate }) {
+export default function TaskListDrawer({ open, onOpenChange, title, color, tasks, timeBlocks = [], onEdit, defaultDate, projectId }) {
   const [editTask, setEditTask] = useState(null);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const queryClient = useQueryClient();
@@ -117,7 +117,10 @@ export default function TaskListDrawer({ open, onOpenChange, title, color, tasks
         open={showTaskForm}
         onOpenChange={setShowTaskForm}
         task={editTask || (defaultDate ? { due_date: defaultDate } : null)}
-        onSave={() => queryClient.invalidateQueries({ queryKey: ['tasks'] })}
+        onSave={() => {
+          queryClient.invalidateQueries({ queryKey: ['tasks'] });
+          if (projectId) queryClient.invalidateQueries({ queryKey: ['tasks', 'project', projectId] });
+        }}
       />
     </>
   );

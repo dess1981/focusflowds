@@ -39,6 +39,14 @@ export default function Projects() {
     queryFn: () => base44.entities.Task.list('-created_date', 500),
   });
 
+  // Dedicated query for drawer tasks — always fetches fresh data when a project drawer opens
+  const { data: drawerTasks = [] } = useQuery({
+    queryKey: ['tasks', 'project', drawerProject?.id],
+    queryFn: () => base44.entities.Task.filter({ project_id: drawerProject.id }),
+    enabled: !!drawerProject,
+    staleTime: 0,
+  });
+
   const saveMutation = useMutation({
     mutationFn: async (data) => {
       if (editProject) {
@@ -160,7 +168,8 @@ export default function Projects() {
         onOpenChange={(v) => !v && setDrawerProject(null)}
         title={drawerProject?.name || ''}
         color={drawerProject?.color}
-        tasks={tasks.filter(t => t.project_id === drawerProject?.id)}
+        tasks={drawerTasks}
+        projectId={drawerProject?.id}
         onEdit={() => { openForm(drawerProject); setDrawerProject(null); }}
       />
 
