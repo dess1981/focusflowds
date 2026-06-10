@@ -72,14 +72,14 @@ export default function EmailManager() {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-64">
         <div className="w-8 h-8 border-4 border-slate-200 border-t-primary rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-[calc(100vh-6rem)] bg-background">
       {/* Main chat area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}

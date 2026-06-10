@@ -15,6 +15,12 @@ export default function Sidebar({ isMobileSheet = false }) {
 
   const navSections = [
     {
+      title: '',
+      items: [
+        { path: '/home', icon: LayoutDashboard, label: language === 'en' ? 'Home' : 'Home' },
+      ],
+    },
+    {
       title: language === 'en' ? 'Today' : 'Hoje',
       items: [
         { path: '/', icon: CalendarDays, label: language === 'en' ? 'Daily Planner' : 'Planner Diário' },

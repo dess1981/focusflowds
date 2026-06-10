@@ -82,6 +82,10 @@
       "type": "string",
       "description": "ID da tarefa pai (para subtarefas)"
     },
+    "related_task_id": {
+      "type": "string",
+      "description": "ID de uma tarefa relacionada (autorrelacionamento)"
+    },
     "due_date": {
       "type": "string",
       "format": "date"

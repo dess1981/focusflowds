@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, Mail } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 export default function DelegateTaskDialog({ isOpen, onClose, task }) {
   const [email, setEmail] = useState('');
   const [createFollowup, setCreateFollowup] = useState(true);
+  const [followupDueDate, setFollowupDueDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDelegate = async () => {
@@ -23,7 +25,8 @@ export default function DelegateTaskDialog({ isOpen, onClose, task }) {
       await base44.functions.invoke('delegateTask', {
         taskId: task.id,
         delegatedTo: email,
-        createFollowup
+        createFollowup,
+        followupDueDate: followupDueDate || undefined
       });
 
       toast.success('Tarefa delegada com sucesso!');
@@ -73,6 +76,22 @@ export default function DelegateTaskDialog({ isOpen, onClose, task }) {
               Criar tarefa de acompanhamento
             </label>
           </div>
+
+          {createFollowup && (
+            <div>
+              <Label className="text-sm font-medium mb-1 block">Prazo para acompanhamento</Label>
+              <Input
+                type="date"
+                value={followupDueDate}
+                onChange={e => setFollowupDueDate(e.target.value)}
+                disabled={isLoading}
+                className="text-sm"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Se vazio, o acompanhamento será agendado para 3 dias a partir de hoje
+              </p>
+            </div>
+          )}
 
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-3">
             <p className="text-xs text-foreground/80">

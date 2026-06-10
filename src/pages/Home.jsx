@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import DailyTasksWidget from '@/components/home/DailyTasksWidget';
 import SmartNotifications from '@/components/SmartNotifications';
+import HealthSummaryWidget from '@/components/home/HealthSummaryWidget';
+import CategoryPieChart from '@/components/home/CategoryPieChart';
 import { Send, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -98,8 +100,10 @@ export default function Home() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Main Content - Tasks */}
-      <div className="lg:col-span-2">
+      {/* Main Content - Tasks + Saúde + Gráfico */}
+      <div className="lg:col-span-2 space-y-4">
+        <HealthSummaryWidget />
+        <CategoryPieChart />
         <DailyTasksWidget />
       </div>
 

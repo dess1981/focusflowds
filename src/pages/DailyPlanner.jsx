@@ -8,6 +8,7 @@ import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import SmartNotifications from '@/components/SmartNotifications';
 import CompactCalendar from '@/components/CompactCalendar';
 import DailyTasksList from '@/components/DailyTasksList';
+import DailyNotes from '@/components/planner/DailyNotes';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
@@ -181,6 +182,8 @@ export default function DailyPlanner() {
           )}
         </div>
       </div>
+
+      <DailyNotes selectedDate={selectedDate} />
 
       <TaskFormDialog
         open={showForm}

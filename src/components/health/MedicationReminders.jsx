@@ -7,6 +7,37 @@ import { Badge } from '@/components/ui/badge';
 import { Bell, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Toca um bipe via Web Audio API (sem dependências externas)
+function playBeep(type = 'upcoming') {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    if (type === 'overdue') {
+      // Bipe urgente: dois bipes rápidos em frequência alta
+      oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+      oscillator.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
+      oscillator.frequency.setValueAtTime(880, ctx.currentTime + 0.3);
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + 0.5);
+    } else {
+      // Bipe suave: tom único curto
+      oscillator.frequency.setValueAtTime(520, ctx.currentTime);
+      gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + 0.3);
+    }
+  } catch (e) {
+    // AudioContext não disponível — silencioso
+  }
+}
+
 export default function MedicationReminders() {
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -47,29 +78,33 @@ export default function MedicationReminders() {
         setReminders(response.data.pending_reminders);
         setLastCheck(new Date());
 
-        // Mostrar notificação do navegador para medicações urgentes
+        // Mostrar notificação e som para medicações urgentes
         if (response.data.pending_reminders.length > 0) {
           const overdue = response.data.pending_reminders.filter(r => r.status === 'overdue');
           const upcoming = response.data.pending_reminders.filter(r => r.status === 'upcoming' && r.time_until_minutes <= 5);
 
-          if (overdue.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
-            overdue.forEach(med => {
-              new Notification('💊 Medicação Atrasada!', {
-                body: `${med.medication_name} (${med.dosage}) - Horário: ${med.scheduled_time}`,
-                icon: '/medical-icon.png',
-                tag: `med-${med.medication_id}`,
+          if (overdue.length > 0) {
+            playBeep('overdue');
+            if ('Notification' in window && Notification.permission === 'granted') {
+              overdue.forEach(med => {
+                new Notification('💊 Medicação Atrasada!', {
+                  body: `${med.medication_name} (${med.dosage}) - Horário: ${med.scheduled_time}`,
+                  tag: `med-${med.medication_id}`,
+                });
               });
-            });
+            }
           }
 
-          if (upcoming.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
-            upcoming.forEach(med => {
-              new Notification('🔔 Lembrete de Medicação', {
-                body: `${med.medication_name} (${med.dosage}) em ${med.time_until_minutes} minutos`,
-                icon: '/medical-icon.png',
-                tag: `med-${med.medication_id}`,
+          if (upcoming.length > 0) {
+            playBeep('upcoming');
+            if ('Notification' in window && Notification.permission === 'granted') {
+              upcoming.forEach(med => {
+                new Notification('🔔 Lembrete de Medicação', {
+                  body: `${med.medication_name} (${med.dosage}) em ${med.time_until_minutes} minutos`,
+                  tag: `med-${med.medication_id}`,
+                });
               });
-            });
+            }
           }
         }
       }
