@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Trash2, FileText, Download } from 'lucide-react';
+import { Plus, Pencil, Trash2, FileText, Download, Mail } from 'lucide-react';
+import SendTestResultEmailModal from './SendTestResultEmailModal';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { parseLocalDate } from '@/lib/dateUtils';
@@ -17,6 +18,7 @@ import { parseLocalDate } from '@/lib/dateUtils';
 export default function MedicalTestsPanel() {
   const [showForm, setShowForm] = useState(false);
   const [editingTest, setEditingTest] = useState(null);
+  const [emailTest, setEmailTest] = useState(null);
   const [form, setForm] = useState({
     test_name: '',
     date_requested: '',
@@ -137,6 +139,13 @@ export default function MedicalTestsPanel() {
                       <Pencil className="w-3 h-3" />
                     </button>
                     <button
+                      onClick={() => setEmailTest(test)}
+                      className="p-1.5 hover:bg-accent/10 rounded-lg text-accent text-xs transition-colors"
+                      title="Enviar por email"
+                    >
+                      <Mail className="w-3 h-3" />
+                    </button>
+                    <button
                       onClick={() => deleteMutation.mutate(test.id)}
                       disabled={deleteMutation.isPending}
                       className="p-1.5 hover:bg-destructive/10 rounded-lg text-destructive text-xs transition-colors"
@@ -177,6 +186,13 @@ export default function MedicalTestsPanel() {
                     >
                       <Pencil className="w-3 h-3" />
                     </button>
+                    <button
+                      onClick={() => setEmailTest(test)}
+                      className="p-1.5 hover:bg-accent/10 rounded-lg text-accent text-xs transition-colors"
+                      title="Enviar resultado por email"
+                    >
+                      <Mail className="w-3 h-3" />
+                    </button>
                     {test.file_url && (
                       <a
                         href={test.file_url}
@@ -205,6 +221,12 @@ export default function MedicalTestsPanel() {
           )}
         </CardContent>
       </Card>
+
+      <SendTestResultEmailModal
+        test={emailTest}
+        open={!!emailTest}
+        onClose={() => setEmailTest(null)}
+      />
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">

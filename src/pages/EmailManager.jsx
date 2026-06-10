@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, MessageCircle, Plus } from 'lucide-react';
+import { Send, MessageCircle, Plus, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
 
 const AGENT_NAME = 'email_manager';
 
@@ -14,6 +14,7 @@ export default function EmailManager() {
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(authed => {
@@ -26,13 +27,16 @@ export default function EmailManager() {
   // Subscribe to conversation updates
   useEffect(() => {
     if (!conversationId) return;
-
     const unsubscribe = base44.agents.subscribeToConversation(conversationId, (data) => {
       setMessages(data.messages || []);
     });
-
     return unsubscribe;
   }, [conversationId]);
+
+  // Auto-scroll on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const startNewConversation = async () => {
     try {
@@ -130,7 +134,7 @@ export default function EmailManager() {
               </p>
             </div>
           ) : (
-            messages.map((msg, idx) => (
+            messages.filter(m => m.content).map((msg, idx) => (
               <div
                 key={idx}
                 className={cn(
@@ -139,48 +143,58 @@ export default function EmailManager() {
                 )}
               >
                 {msg.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <MessageCircle className="w-4 h-4 text-primary" />
                   </div>
                 )}
                 <div
                   className={cn(
-                    'max-w-md rounded-lg px-4 py-2.5 text-sm',
+                    'max-w-[80%] rounded-2xl px-4 py-2.5 text-sm',
                     msg.role === 'user'
                       ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground border border-border'
+                      : 'bg-muted/60 border border-border text-foreground'
                   )}
                 >
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  {msg.role === 'assistant' ? (
+                    <ReactMarkdown className="prose prose-sm prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                      {msg.content}
+                    </ReactMarkdown>
+                  ) : (
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                  )}
                 </div>
               </div>
             ))
           )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input area */}
         {conversationId && (
-          <div className="border-t border-border p-4 space-y-3">
-            <Textarea
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && e.ctrlKey) {
-                  sendMessage();
-                }
-              }}
-              placeholder="Digite sua instrução (Ctrl+Enter para enviar)..."
-              className="resize-none h-20"
-              disabled={loading}
-            />
-            <Button
-              onClick={sendMessage}
-              disabled={loading || !inputValue.trim()}
-              className="w-full gap-2"
-            >
-              <Send className="w-4 h-4" />
-              {loading ? 'Processando...' : 'Enviar'}
-            </Button>
+          <div className="border-t border-border p-3">
+            <div className="flex gap-2 items-end">
+              <Textarea
+                value={inputValue}
+                onChange={e => setInputValue(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                  }
+                }}
+                placeholder="Digite sua instrução (Enter envia, Shift+Enter nova linha)..."
+                className="resize-none min-h-[60px] max-h-[120px] flex-1"
+                disabled={loading}
+              />
+              <Button
+                onClick={sendMessage}
+                disabled={loading || !inputValue.trim()}
+                size="icon"
+                className="h-10 w-10 flex-shrink-0"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              </Button>
+            </div>
           </div>
         )}
       </div>
