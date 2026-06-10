@@ -105,8 +105,6 @@ export default function SmartNotifications() {
   const visible = notifications.filter(n => !dismissed.includes(n.title));
   const urgentCount = visible.filter(n => n.type === 'urgent').length;
 
-  if (!loading && visible.length === 0 && lastLoaded) return null;
-
   return (
     <div
       className="rounded-2xl overflow-hidden"
@@ -157,6 +155,13 @@ export default function SmartNotifications() {
             </div>
           ) : (
             <>
+              {visible.length === 0 && !loading && (
+                <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+                  <Bell className="w-8 h-8 text-primary/30" />
+                  <p className="text-sm font-medium text-foreground/60">Tudo em dia!</p>
+                  <p className="text-xs text-muted-foreground">Nenhum alerta pendente no momento.</p>
+                </div>
+              )}
               {visible.map((notif, i) => (
                 <NotificationCard key={i} notif={notif} onDismiss={handleDismiss} />
               ))}

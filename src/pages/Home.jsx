@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import DailyTasksWidget from '@/components/home/DailyTasksWidget';
+import SmartNotifications from '@/components/SmartNotifications';
 import { Send, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -115,7 +116,7 @@ export default function Home() {
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            Resumo
+            Alertas
           </button>
           <button
             onClick={() => setActiveTab('ai')}
@@ -132,13 +133,8 @@ export default function Home() {
 
         {/* Content */}
         {activeTab === 'tasks' ? (
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            <div className="text-center py-8">
-              <Sparkles className="w-8 h-8 text-primary mx-auto mb-2 opacity-60" />
-              <p className="text-sm text-muted-foreground">
-                Veja suas tarefas na coluna principal
-              </p>
-            </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            <SmartNotifications />
           </div>
         ) : (
           <>
