@@ -30,9 +30,27 @@
       ],
       "default": "active"
     },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de in\u00edcio do projeto"
+    },
     "due_date": {
       "type": "string",
-      "format": "date"
+      "format": "date",
+      "description": "Data de entrega/conclus\u00e3o"
+    },
+    "objective": {
+      "type": "string",
+      "description": "Objetivo principal do projeto"
+    },
+    "metric": {
+      "type": "string",
+      "description": "M\u00e9trica de sucesso (ex: clientes, receita, entregas)"
+    },
+    "cost": {
+      "type": "number",
+      "description": "Or\u00e7amento ou custo estimado"
     }
   },
   "required": [

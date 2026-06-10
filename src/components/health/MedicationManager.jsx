@@ -10,6 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 
+const DAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+const DAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
 export default function MedicationManager() {
   const [showForm, setShowForm] = useState(false);
   const [editingMed, setEditingMed] = useState(null);
@@ -18,6 +21,7 @@ export default function MedicationManager() {
     dosage: '',
     frequency: 'uma vez',
     time_of_day: [],
+    recurrence_days: [],
     doctor: '',
     notes: '',
   });
@@ -48,6 +52,15 @@ export default function MedicationManager() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['medications'] }),
   });
 
+  const toggleDay = (day) => {
+    setForm(f => {
+      const days = f.recurrence_days.includes(day)
+        ? f.recurrence_days.filter(d => d !== day)
+        : [...f.recurrence_days, day];
+      return { ...f, recurrence_days: days };
+    });
+  };
+
   const resetForm = () => {
     setEditingMed(null);
     setForm({
@@ -55,6 +68,7 @@ export default function MedicationManager() {
       dosage: '',
       frequency: 'uma vez',
       time_of_day: [],
+      recurrence_days: [],
       doctor: '',
       notes: '',
     });
@@ -68,6 +82,7 @@ export default function MedicationManager() {
         dosage: med.dosage || '',
         frequency: med.frequency || 'uma vez',
         time_of_day: med.time_of_day || [],
+        recurrence_days: med.recurrence_days || [],
         doctor: med.doctor || '',
         notes: med.notes || '',
       });
@@ -192,6 +207,28 @@ export default function MedicationManager() {
                   <SelectItem value="conforme necessário">Conforme necessário</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <Label>Dias da semana</Label>
+              <p className="text-xs text-muted-foreground mb-2">Vazio = todos os dias</p>
+              <div className="flex gap-1.5 mt-1">
+                {DAYS.map((label, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => toggleDay(idx)}
+                    className={`w-8 h-8 rounded-full text-xs font-semibold transition-all border-2 ${
+                      form.recurrence_days.includes(idx)
+                        ? 'bg-primary border-primary text-primary-foreground'
+                        : 'bg-muted/30 border-border/50 text-muted-foreground hover:border-primary/50'
+                    }`}
+                    title={DAY_LABELS[idx]}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>

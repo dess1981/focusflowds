@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { format, isToday } from 'date-fns';
+import { format, isToday, addDays, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Plus, CalendarDays, Sparkles } from 'lucide-react';
+import { Plus, CalendarDays, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import SmartNotifications from '@/components/SmartNotifications';
 import CompactCalendar from '@/components/CompactCalendar';
@@ -58,16 +58,43 @@ export default function DailyPlanner() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1
-          className="text-2xl font-heading font-bold tracking-tight text-white"
-          style={{ textShadow: '0 0 30px rgba(168,85,247,0.4)' }}
-        >
-          {isToday(selectedDate) ? 'Hoje' : format(selectedDate, "EEEE", { locale: ptBR })}
-        </h1>
-        <p className="text-sm mt-0.5 capitalize" style={{ color: 'rgba(255,255,255,0.4)' }}>
-          {format(selectedDate, "d 'de' MMMM, yyyy", { locale: ptBR })}
-        </p>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1
+            className="text-2xl font-heading font-bold tracking-tight text-white"
+            style={{ textShadow: '0 0 30px rgba(168,85,247,0.4)' }}
+          >
+            {isToday(selectedDate) ? 'Hoje' : format(selectedDate, "EEEE", { locale: ptBR })}
+          </h1>
+          <p className="text-sm mt-0.5 capitalize" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            {format(selectedDate, "d 'de' MMMM, yyyy", { locale: ptBR })}
+          </p>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setSelectedDate(d => subDays(d, 1))}
+            className="p-2 rounded-lg transition-colors hover:bg-white/10"
+            style={{ color: 'rgba(255,255,255,0.6)' }}
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          {!isToday(selectedDate) && (
+            <button
+              onClick={() => setSelectedDate(new Date())}
+              className="px-3 py-1 rounded-lg text-xs font-semibold transition-colors"
+              style={{ background: 'rgba(168,85,247,0.15)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.3)' }}
+            >
+              Hoje
+            </button>
+          )}
+          <button
+            onClick={() => setSelectedDate(d => addDays(d, 1))}
+            className="p-2 rounded-lg transition-colors hover:bg-white/10"
+            style={{ color: 'rgba(255,255,255,0.6)' }}
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Two-column layout: Calendar on left, Tasks on right (stack on mobile) */}

@@ -9,9 +9,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Trash2, Calendar, Clock, Phone } from 'lucide-react';
+import { Plus, Pencil, Trash2, Calendar, Clock, Phone, Microscope, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { parseLocalDate } from '@/lib/dateUtils';
 
 export default function MedicalAppointmentsPanel() {
   const [showForm, setShowForm] = useState(false);
@@ -28,12 +29,18 @@ export default function MedicalAppointmentsPanel() {
     notes: '',
     status: 'agendada',
     health_insurance: '',
+    associated_test_ids: [],
   });
   const queryClient = useQueryClient();
 
   const { data: appointments = [] } = useQuery({
     queryKey: ['medical-appointments'],
     queryFn: () => base44.entities.MedicalAppointment.list('-date'),
+  });
+
+  const { data: allTests = [] } = useQuery({
+    queryKey: ['medical-tests'],
+    queryFn: () => base44.entities.MedicalTest.list('-date_requested'),
   });
 
   const saveMutation = useMutation({
@@ -56,6 +63,15 @@ export default function MedicalAppointmentsPanel() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['medical-appointments'] }),
   });
 
+  const toggleTestLink = (testId) => {
+    setForm(f => {
+      const ids = (f.associated_test_ids || []).includes(testId)
+        ? (f.associated_test_ids || []).filter(id => id !== testId)
+        : [...(f.associated_test_ids || []), testId];
+      return { ...f, associated_test_ids: ids };
+    });
+  };
+
   const resetForm = () => {
     setEditingAppt(null);
     setForm({
@@ -70,13 +86,14 @@ export default function MedicalAppointmentsPanel() {
       notes: '',
       status: 'agendada',
       health_insurance: '',
+      associated_test_ids: [],
     });
   };
 
   const openForm = (appt = null) => {
     if (appt) {
       setEditingAppt(appt);
-      setForm({ ...appt });
+      setForm({ ...appt, associated_test_ids: appt.associated_test_ids || [] });
     } else {
       resetForm();
     }
@@ -130,7 +147,7 @@ export default function MedicalAppointmentsPanel() {
                     {appt.date && appt.time && (
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3 h-3" />
-                        {format(new Date(appt.date), 'dd/MMM', { locale: ptBR })} às {appt.time}
+                        {format(parseLocalDate(appt.date), 'dd/MMM', { locale: ptBR })} às {appt.time}
                       </div>
                     )}
                     {appt.clinic_name && (
@@ -144,6 +161,19 @@ export default function MedicalAppointmentsPanel() {
                     )}
                     {appt.reason && (
                       <p>Motivo: {appt.reason}</p>
+                    )}
+                    {appt.associated_test_ids?.length > 0 && (
+                      <div className="flex items-center gap-1 flex-wrap mt-1">
+                        <Microscope className="w-3 h-3 text-accent" />
+                        {appt.associated_test_ids.map(tid => {
+                          const t = allTests.find(x => x.id === tid);
+                          return t ? (
+                            <span key={tid} className="text-xs bg-accent/10 text-accent px-1.5 py-0.5 rounded-full">
+                              {t.test_name}
+                            </span>
+                          ) : null;
+                        })}
+                      </div>
                     )}
                   </div>
 
@@ -175,7 +205,7 @@ export default function MedicalAppointmentsPanel() {
                   <div className="flex items-center justify-between gap-2">
                     <div>
                       <p className="font-medium">{appt.doctor_name}</p>
-                      <p className="text-muted-foreground">{format(new Date(appt.date), 'dd/MMM/yyyy', { locale: ptBR })}</p>
+                      <p className="text-muted-foreground">{format(parseLocalDate(appt.date), 'dd/MMM/yyyy', { locale: ptBR })}</p>
                     </div>
                     <Badge variant="outline">{statusConfig[appt.status].label}</Badge>
                   </div>
@@ -315,6 +345,30 @@ export default function MedicalAppointmentsPanel() {
                 className="mt-1 min-h-[60px] resize-none"
               />
             </div>
+
+            {allTests.length > 0 && (
+              <div>
+                <Label>Exames vinculados</Label>
+                <div className="mt-1 space-y-1 max-h-40 overflow-y-auto border border-border/50 rounded-lg p-2">
+                  {allTests.map(test => (
+                    <label key={test.id} className="flex items-center gap-2 cursor-pointer p-1.5 rounded hover:bg-muted/30">
+                      <input
+                        type="checkbox"
+                        checked={(form.associated_test_ids || []).includes(test.id)}
+                        onChange={() => toggleTestLink(test.id)}
+                        className="w-3.5 h-3.5 accent-primary"
+                      />
+                      <span className="text-xs">{test.test_name}</span>
+                      {test.date_requested && (
+                        <span className="text-xs text-muted-foreground ml-auto">
+                          {format(parseLocalDate(test.date_requested), 'dd/MM', { locale: ptBR })}
+                        </span>
+                      )}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <DialogFooter>

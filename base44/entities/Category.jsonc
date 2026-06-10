@@ -16,9 +16,9 @@
       "description": "\u00cdcone da categoria",
       "default": "tag"
     },
-    "daily_goal_hours": {
+    "daily_goal_minutes": {
       "type": "number",
-      "description": "Meta di\u00e1ria em horas",
+      "description": "Meta di\u00e1ria em minutos",
       "default": 0
     }
   },

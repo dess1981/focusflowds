@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Pencil, Trash2, FileText, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { parseLocalDate } from '@/lib/dateUtils';
 
 export default function MedicalTestsPanel() {
   const [showForm, setShowForm] = useState(false);
@@ -113,7 +114,7 @@ export default function MedicalTestsPanel() {
                     <div className="flex-1">
                       <p className="text-sm font-medium">{test.test_name}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Solicitado em {format(new Date(test.date_requested), 'dd/MMM/yyyy', { locale: ptBR })}
+                        Solicitado em {format(parseLocalDate(test.date_requested), 'dd/MMM/yyyy', { locale: ptBR })}
                       </p>
                     </div>
                     <Badge className={statusConfig[test.status].color}>
@@ -158,7 +159,7 @@ export default function MedicalTestsPanel() {
                       <p className="text-sm font-medium">{test.test_name}</p>
                       {test.date_result && (
                         <p className="text-xs text-muted-foreground">
-                          Resultado: {format(new Date(test.date_result), 'dd/MMM/yyyy', { locale: ptBR })}
+                          Resultado: {format(parseLocalDate(test.date_result), 'dd/MMM/yyyy', { locale: ptBR })}
                         </p>
                       )}
                     </div>

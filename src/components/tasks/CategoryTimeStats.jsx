@@ -1,24 +1,34 @@
 import React, { useMemo } from 'react';
+import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
-import { BarChart3, TrendingUp } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 
-const categoryColors = {
-  'Financeiro': '#F59E0B',
-  'Estudo': '#8B5CF6',
-  'Trabalho': '#3B82F6',
-  'Pessoal': '#EC4899',
-  'Saúde': '#10B981',
-  'Social': '#06B6D4',
-};
+const FALLBACK_COLORS = ['#a855f7','#22d3ee','#f59e0b','#ec4899','#10b981','#3b82f6','#f97316'];
 
 export default function CategoryTimeStats({ tasks }) {
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => base44.entities.Category.list(),
+  });
+
+  const getCategoryName = (id) => {
+    if (!id) return 'Sem categoria';
+    const cat = categories.find(c => c.id === id);
+    return cat ? cat.name : 'Sem categoria';
+  };
+
+  const getCategoryColor = (id) => {
+    const cat = categories.find(c => c.id === id);
+    return cat?.color || '#6B7280';
+  };
+
   const stats = useMemo(() => {
     const categoryStats = {};
     let totalMinutes = 0;
 
-    // Calcula tempo estimado por categoria
     tasks.forEach(task => {
-      const category = task.category_id || 'Sem categoria';
+      const category = task.category_id || '__none__';
       if (!categoryStats[category]) {
         categoryStats[category] = { minutes: 0, count: 0 };
       }
@@ -32,8 +42,8 @@ export default function CategoryTimeStats({ tasks }) {
 
     // Calcula percentuais
     const sorted = Object.entries(categoryStats)
-      .map(([category, data]) => ({
-        category,
+      .map(([categoryId, data]) => ({
+        categoryId,
         ...data,
         percentage: totalMinutes > 0 ? Math.round((data.minutes / totalMinutes) * 100) : 0,
       }))
@@ -58,17 +68,17 @@ export default function CategoryTimeStats({ tasks }) {
           {/* Barra visual horizontal */}
           {stats.stats.length > 0 && (
             <div className="flex h-8 rounded-lg overflow-hidden gap-0.5 bg-muted/30">
-              {stats.stats.map(({ category, percentage, minutes }) => (
+              {stats.stats.map(({ categoryId, percentage, minutes }, i) => (
                 percentage > 0 && (
                   <div
-                    key={category}
+                    key={categoryId}
                     className="flex items-center justify-center text-xs font-semibold text-white transition-all hover:opacity-80"
                     style={{
                       width: `${percentage}%`,
-                      backgroundColor: categoryColors[category] || '#6B7280',
+                      backgroundColor: getCategoryColor(categoryId !== '__none__' ? categoryId : null),
                       minWidth: percentage > 5 ? 'auto' : '0',
                     }}
-                    title={`${category}: ${minutes}m (${percentage}%)`}
+                    title={`${getCategoryName(categoryId !== '__none__' ? categoryId : null)}: ${minutes}m (${percentage}%)`}
                   >
                     {percentage > 8 && <span>{percentage}%</span>}
                   </div>
@@ -79,20 +89,22 @@ export default function CategoryTimeStats({ tasks }) {
 
           {/* Cards de categoria */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {stats.stats.map(({ category, minutes, count, percentage }) => {
+            {stats.stats.map(({ categoryId, minutes, count, percentage }) => {
               const hours = Math.floor(minutes / 60);
               const mins = minutes % 60;
+              const name = getCategoryName(categoryId !== '__none__' ? categoryId : null);
+              const color = getCategoryColor(categoryId !== '__none__' ? categoryId : null);
               return (
                 <div
-                  key={category}
+                  key={categoryId}
                   className="flex flex-col gap-2 p-3 rounded-lg bg-background/50 border border-border/50 hover:border-primary/30 transition-colors"
                 >
                   <div className="flex items-center gap-2">
                     <div
                       className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: categoryColors[category] || '#6B7280' }}
+                      style={{ backgroundColor: color }}
                     />
-                    <p className="text-xs font-medium truncate flex-1">{category}</p>
+                    <p className="text-xs font-medium truncate flex-1">{name}</p>
                     <span className="text-xs font-semibold text-primary">{percentage}%</span>
                   </div>
                   <div className="flex items-baseline gap-1 text-xs text-muted-foreground">
