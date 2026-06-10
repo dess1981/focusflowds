@@ -104,6 +104,13 @@ export default function TaskCard({ task, onStatusChange, onClick, onRefresh, com
             </span>
           )}
 
+          {task.status === 'delegado' && task.delegated_to && (
+            <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full"
+              style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.2)' }}>
+              👤 {task.delegated_to.split('@')[0]}
+            </span>
+          )}
+
           {task.estimated_minutes && (
             <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
               {task.estimated_minutes}min

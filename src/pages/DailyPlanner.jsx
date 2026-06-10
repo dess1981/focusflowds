@@ -100,9 +100,10 @@ export default function DailyPlanner() {
 
       {/* Two-column layout: Calendar on left, Tasks on right (stack on mobile) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendar — left column, 1/3 width on desktop */}
-        <div className="lg:col-span-1">
+        {/* Calendar + Notes — left column, 1/3 width on desktop */}
+        <div className="lg:col-span-1 space-y-4">
           <CompactCalendar selectedDate={selectedDate} onDateSelect={setSelectedDate} />
+          <DailyNotes selectedDate={selectedDate} />
         </div>
 
         {/* Tasks — right column, 2/3 width on desktop */}
@@ -182,8 +183,6 @@ export default function DailyPlanner() {
           )}
         </div>
       </div>
-
-      <DailyNotes selectedDate={selectedDate} />
 
       <TaskFormDialog
         open={showForm}

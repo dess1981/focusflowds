@@ -23,13 +23,14 @@ const iconMap = {
 };
 
 const mainItems = [
+  { path: '/home', icon: LayoutDashboard, label: 'Home' },
   { path: '/', icon: CalendarDays, label: 'Planner' },
   { path: '/tasks', icon: ListTodo, label: 'Tarefas' },
-  { path: '/assistant', icon: Brain, label: 'IA' },
-  { path: '/email-manager', icon: Sparkles, label: 'Gmail' },
+  { path: '/health', icon: Heart, label: 'Saúde' },
 ];
 
 const allItems = [
+  { path: '/home', icon: LayoutDashboard, label: 'Home' },
   { path: '/', icon: CalendarDays, label: 'Planner' },
   { path: '/daily-list', icon: CheckCircle2, label: 'Hoje' },
   { path: '/tasks', icon: ListTodo, label: 'Tarefas' },

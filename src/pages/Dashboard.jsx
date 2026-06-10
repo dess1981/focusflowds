@@ -205,7 +205,7 @@ export default function Dashboard() {
       </div>
 
       {/* Category Goals */}
-      {categories.some(c => c.daily_goal_hours > 0) && (
+      {categories.some(c => (c.daily_goal_minutes || c.daily_goal_hours) > 0) && (
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-semibold">Metas Diárias</CardTitle>
@@ -213,7 +213,7 @@ export default function Dashboard() {
           <CardContent>
             <div className="space-y-4">
               {categories
-                .filter(c => c.daily_goal_hours > 0)
+                .filter(c => (c.daily_goal_minutes || c.daily_goal_hours) > 0)
                 .map(cat => (
                   <div key={cat.id} className="space-y-2">
                     <p className="text-sm font-medium">{cat.name}</p>
