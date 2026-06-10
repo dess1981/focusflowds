@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { addDays, subDays, format, isToday, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
+import { format, isToday, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function CompactCalendar({ selectedDate, onDateSelect }) {
-  const monthStart = startOfMonth(selectedDate);
-  const monthEnd = endOfMonth(selectedDate);
+  const [viewMonth, setViewMonth] = useState(startOfMonth(selectedDate));
+
+  const monthStart = startOfMonth(viewMonth);
+  const monthEnd = endOfMonth(viewMonth);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
   
   const firstDayOfWeek = monthStart.getDay();
@@ -25,17 +27,17 @@ export default function CompactCalendar({ selectedDate, onDateSelect }) {
       {/* Month header */}
       <div className="flex items-center justify-between mb-4">
         <button
-          onClick={() => onDateSelect(subDays(selectedDate, 1))}
+          onClick={() => setViewMonth(m => subMonths(m, 1))}
           className="p-1.5 rounded-lg transition-all"
           style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)' }}
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <span className="text-sm font-semibold text-white">
-          {format(selectedDate, 'MMMM yyyy', { locale: ptBR })}
+        <span className="text-sm font-semibold text-white capitalize">
+          {format(viewMonth, 'MMMM yyyy', { locale: ptBR })}
         </span>
         <button
-          onClick={() => onDateSelect(addDays(selectedDate, 1))}
+          onClick={() => setViewMonth(m => addMonths(m, 1))}
           className="p-1.5 rounded-lg transition-all"
           style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)' }}
         >
@@ -67,7 +69,7 @@ export default function CompactCalendar({ selectedDate, onDateSelect }) {
               key={idx}
               onClick={() => day && onDateSelect(day)}
               disabled={!day}
-              className="aspect-square rounded-lg text-xs font-medium transition-all disabled:opacity-30"
+              className="aspect-square rounded-lg text-xs font-medium transition-all disabled:opacity-0"
               style={
                 isSelected ? {
                   background: 'linear-gradient(135deg, rgba(168,85,247,0.4), rgba(34,211,238,0.2))',
@@ -92,7 +94,7 @@ export default function CompactCalendar({ selectedDate, onDateSelect }) {
 
       {/* Today button */}
       <button
-        onClick={() => onDateSelect(new Date())}
+        onClick={() => { onDateSelect(new Date()); setViewMonth(startOfMonth(new Date())); }}
         className="w-full mt-3 py-2 rounded-lg text-xs font-medium transition-all"
         style={{
           background: 'rgba(255,255,255,0.06)',
