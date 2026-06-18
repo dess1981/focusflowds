@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
 
     const { query = 'is:unread label:INBOX', maxResults = 20 } = await req.json();
 
-    const { accessToken } = await base44.asServiceRole.connectors.getCurrentAppUserConnection('gmail_conn_id');
+    const { accessToken } = await base44.asServiceRole.connectors.getCurrentAppUserConnection('6a2653358a1cda4730de81b3');
 
     const listResponse = await fetch(
       `https://www.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=${maxResults}`,
