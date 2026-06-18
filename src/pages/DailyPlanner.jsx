@@ -176,6 +176,10 @@ export default function DailyPlanner() {
                   <DailyTasksList
                     tasks={sortedTasks}
                     onTaskClick={(task) => { setEditTask(task); setShowForm(true); }}
+                    onToggleDone={(task) => updateStatus.mutate({
+                      task,
+                      status: task.status === 'done' ? 'todo' : 'done',
+                    })}
                   />
                 </div>
               )}
