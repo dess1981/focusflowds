@@ -98,11 +98,23 @@ export default function TaskFormDialog({ open, onOpenChange, task, onSave }) {
       if (data[k] === '') delete data[k];
     });
 
+    let savedTask;
     if (isEdit) {
       await base44.entities.Task.update(task.id, data);
+      savedTask = { ...data, id: task.id };
     } else {
-      await base44.entities.Task.create(data);
+      savedTask = await base44.entities.Task.create(data);
     }
+
+    // Sincronizar com Google Calendar em background (silencioso se não conectado)
+    if (savedTask?.id && savedTask?.due_date) {
+      base44.functions.invoke('syncEventToGoogleCalendar', {
+        entityType: 'Task',
+        entity: savedTask,
+        action: isEdit ? 'update' : 'create',
+      }).catch(() => {});
+    }
+
     onSave?.();
     onOpenChange(false);
   };

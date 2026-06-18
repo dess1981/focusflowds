@@ -7,7 +7,7 @@ import {
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Plus, Lock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Lock, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import TaskFormDialog from '@/components/tasks/TaskFormDialog.jsx';
 import TaskListDrawer from '@/components/tasks/TaskListDrawer';
@@ -34,7 +34,26 @@ export default function Calendar() {
   const [showForm, setShowForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [drawerDate, setDrawerDate] = useState(null);
+  const [importing, setImporting] = useState(false);
   const queryClient = useQueryClient();
+
+  const handleImportFromGoogle = async () => {
+    setImporting(true);
+    try {
+      const res = await base44.functions.invoke('importGoogleCalendarEvents', {});
+      const { created, updated } = res.data;
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      const msg = [];
+      if (created > 0) msg.push(`${created} novos eventos importados`);
+      if (updated > 0) msg.push(`${updated} atualizados`);
+      if (msg.length === 0) msg.push('Calendário já está sincronizado!');
+      alert(msg.join(', '));
+    } catch (e) {
+      alert('Conecte o Google Calendar primeiro para importar eventos.');
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks'],
@@ -139,13 +158,19 @@ export default function Calendar() {
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <div className="hidden sm:block">
+          <div className="hidden sm:flex items-center gap-2">
             <GoogleCalendarConnectButton
               connected={gcConnected}
               loading={gcLoading}
               onConnect={gcConnect}
               onDisconnect={gcDisconnect}
             />
+            {gcConnected && (
+              <Button variant="outline" size="sm" onClick={handleImportFromGoogle} disabled={importing} className="gap-1.5 text-xs">
+                <RefreshCw className={`w-3.5 h-3.5 ${importing ? 'animate-spin' : ''}`} />
+                Importar do Google
+              </Button>
+            )}
           </div>
           <Button size="sm" onClick={() => { setSelectedDate(format(new Date(), 'yyyy-MM-dd')); setShowForm(true); }}>
             <Plus className="w-4 h-4" />
